@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CR Layout - Compact Pro</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+<style>
+  .material-symbols-outlined { font-size: 16px; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20; }
+  .material-symbols-outlined.sm { font-size: 14px; }
+  .material-symbols-outlined.xs { font-size: 12px; }
+  .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 20; }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+  * { scrollbar-width: thin; scrollbar-color: #d1d5db transparent; }
+  .toggle-switch { width: 28px; height: 16px; border-radius: 8px; position: relative; cursor: pointer; transition: background 0.2s; }
+  .toggle-switch::after { content: ''; position: absolute; width: 12px; height: 12px; border-radius: 6px; background: #ffffff; top: 2px; left: 2px; transition: transform 0.2s; }
+  .toggle-switch.active { background: #624fa6; }
+  .toggle-switch.active::after { transform: translateX(12px); }
+  .toggle-switch:not(.active) { background: #d1d5db; }
+  .cross-highlight { outline: 2px solid #624fa6; outline-offset: -1px; }
+  .kbd { background: #f3f4f6; padding: 1px 5px; border-radius: 3px; font-size: 9px; border: 1px solid #d1d5db; color: #4b5563; font-family: 'Inter', sans-serif; }
+  .tree-triangle { display: inline-block; font-size: 8px; width: 12px; text-align: center; cursor: pointer; color: #9ca3af; transition: transform 0.15s; user-select: none; }
+  .tree-triangle.expanded { transform: rotate(90deg); }
+  .cat-tree-item { position: relative; }
+  .cat-tree-item .drag-handle { opacity: 0; transition: opacity 0.15s; cursor: grab; }
+  .cat-tree-item:hover .drag-handle { opacity: 0.5; }
+  .cat-tree-item .drag-handle:hover { opacity: 1; }
+  .cat-tree-item.dragging { opacity: 0.4; }
+  .cat-tree-item.drop-above::before {
+    content: ''; position: absolute; top: -1px; left: 0; right: 0; height: 2px; background: #624fa6; z-index: 10; pointer-events: none;
+  }
+  .cat-tree-item.drop-below::after {
+    content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: #624fa6; z-index: 10; pointer-events: none;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; }
+  .scope-dropdown { position: absolute; top: 100%; left: 0; z-index: 50; min-width: 180px; }
+  /* Select articles side sheet */
+  .sa-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 60; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
+  .sa-backdrop.open { opacity: 1; pointer-events: auto; }
+  .sa-sheet { position: fixed; top: 0; right: 0; bottom: 0; width: min(860px, 70vw); background: #fff; z-index: 61; transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; box-shadow: -4px 0 24px rgba(0,0,0,0.08); }
+  .sa-sheet.open { transform: translateX(0); }
+  .sa-table { width: 100%; border-collapse: collapse; }
+  .sa-table th { position: sticky; top: 0; background: #f9fafb; text-align: left; font-size: 11px; font-weight: 600; color: #6b7280; padding: 8px 12px; border-bottom: 1px solid #e5e7eb; cursor: pointer; user-select: none; white-space: nowrap; }
+  .sa-table th:hover { color: #374151; }
+  .sa-table th .sort-arrow { font-size: 10px; margin-left: 2px; opacity: 0.3; }
+  .sa-table th.active-sort .sort-arrow { opacity: 1; color: #624fa6; }
+  .sa-table td { font-size: 12px; padding: 6px 12px; border-bottom: 1px solid #f3f4f6; color: #374151; white-space: nowrap; }
+  .sa-table tr { cursor: pointer; transition: background 0.1s; }
+  .sa-table tbody tr:hover { background: #f9fafb; }
+  .sa-table tbody tr.selected { background: rgba(98,79,166,0.1); }
+  .sa-table tbody tr.selected:hover { background: rgba(98,79,166,0.15); }
+  .sa-cat-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; vertical-align: middle; margin-right: 4px; }
+</style>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: { DEFAULT: '#624fa6', light: '#f3f0ff', container: '#7c6bbf' },
+        surface: { DEFAULT: '#ffffff', container: { DEFAULT: '#ffffff', low: '#ffffff', high: '#f9fafb', lowest: '#ffffff' } },
+        'on-surface': { DEFAULT: '#1f2937', variant: '#6b7280' },
+        'outline-variant': '#e5e7eb',
+        error: '#ef4444',
+        background: '#f9fafb',
+      },
+      fontFamily: {
+        headline: ['Inter', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+      },
+      borderRadius: {
+        DEFAULT: '0.375rem',
+        lg: '0.5rem',
+        xl: '0.75rem',
+        full: '0.75rem',
+      }
+    }
+  }
+}
+</script>
+</head>
+<body class="h-screen overflow-hidden bg-background font-body text-on-surface flex flex-col">
+
+<!-- TITLE BAR -->
+<div id="titleBar" class="h-10 min-h-[40px] bg-white border-b border-gray-200 flex items-center px-3 gap-3 select-none">
+  <!-- Left -->
+  <div class="flex items-center gap-2 shrink-0">
+    <span class="text-sm font-bold text-primary font-headline tracking-wide">OPEN</span>
+    <span class="text-gray-300 text-xs">|</span>
+    <span class="text-xs text-gray-500">BackOffice</span>
+    <span class="material-symbols-outlined xs text-gray-400">chevron_right</span>
+    <span class="text-xs text-gray-800">CR Layout</span>
+  </div>
+  <!-- Center: Scope -->
+  <div class="flex-1 flex items-center justify-center gap-2">
+    <div id="scopeControl" class="relative flex items-center bg-white rounded-md border border-gray-200">
+      <button data-scope="company" class="scope-btn text-xs px-3 py-1 rounded-md transition-all bg-primary text-white">Company</button>
+      <button data-scope="cc" class="scope-btn text-xs px-3 py-1 rounded-md transition-all text-gray-600 hover:bg-gray-50 border border-transparent">Cost Center</button>
+      <button data-scope="cr" class="scope-btn text-xs px-3 py-1 rounded-md transition-all text-gray-600 hover:bg-gray-50 border border-transparent">Register</button>
+    </div>
+    <div id="scopeChip" class="hidden items-center gap-1 bg-gray-100 text-xs text-gray-600 px-2 py-0.5 rounded-md border border-gray-200">
+      <span id="scopeChipText"></span>
+      <button id="scopeChipX" class="material-symbols-outlined xs cursor-pointer hover:text-gray-800">close</button>
+    </div>
+    <!-- Dropdowns -->
+    <div id="scopeDropdownCC" class="scope-dropdown hidden bg-white border border-gray-200 rounded-lg py-1 shadow-lg"></div>
+    <div id="scopeDropdownCR" class="scope-dropdown hidden bg-white border border-gray-200 rounded-lg py-1 shadow-lg"></div>
+  </div>
+  <!-- Right -->
+  <div class="flex items-center gap-2 shrink-0">
+    <span id="inheritanceBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-200">Inherited</span>
+    <span class="text-gray-300 text-xs">|</span>
+    <button id="helpBtn" class="w-6 h-6 flex items-center justify-center rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors">
+      <span class="material-symbols-outlined sm">help_outline</span>
+    </button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="flex-1 flex overflow-hidden">
+
+  <!-- LEFT SIDEBAR -->
+  <div id="sidebar" class="w-12 bg-white border-r border-gray-200 flex flex-col transition-all duration-200 shrink-0 overflow-hidden">
+    <button id="sidebarToggle" class="h-9 flex items-center justify-center hover:bg-gray-100 transition-colors w-full shrink-0 text-gray-600" title="Toggle sidebar (Ctrl+B)">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <div class="flex-1 flex flex-col py-1 gap-0.5">
+      <a href="#" class="sidebar-item flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors rounded-lg mx-1" data-nav="dashboard">
+        <span class="material-symbols-outlined shrink-0">dashboard</span>
+        <span class="sidebar-label text-xs whitespace-nowrap overflow-hidden">Dashboard</span>
+      </a>
+      <a href="#" class="sidebar-item flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors rounded-lg mx-1" data-nav="articles">
+        <span class="material-symbols-outlined shrink-0">restaurant_menu</span>
+        <span class="sidebar-label text-xs whitespace-nowrap overflow-hidden">Articles</span>
+      </a>
+      <a href="#" class="sidebar-item flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors rounded-lg mx-1 active bg-primary text-white border-l-2 border-primary" data-nav="layout">
+        <span class="material-symbols-outlined shrink-0">grid_view</span>
+        <span class="sidebar-label text-xs whitespace-nowrap overflow-hidden">Layout</span>
+      </a>
+      <a href="#" class="sidebar-item flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors rounded-lg mx-1" data-nav="categories">
+        <span class="material-symbols-outlined shrink-0">category</span>
+        <span class="sidebar-label text-xs whitespace-nowrap overflow-hidden">Categories</span>
+      </a>
+      <a href="#" class="sidebar-item flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors rounded-lg mx-1" data-nav="settings">
+        <span class="material-symbols-outlined shrink-0">settings</span>
+        <span class="sidebar-label text-xs whitespace-nowrap overflow-hidden">Settings</span>
+      </a>
+      <a href="#" class="sidebar-item flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors rounded-lg mx-1" data-nav="users">
+        <span class="material-symbols-outlined shrink-0">group</span>
+        <span class="sidebar-label text-xs whitespace-nowrap overflow-hidden">Users</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- CATEGORY TREE -->
+  <div id="categoryTree" class="w-56 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-hidden">
+    <!-- Filter -->
+    <div class="p-2">
+      <div class="relative">
+        <span class="material-symbols-outlined xs absolute left-2 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+        <input id="treeFilter" type="text" placeholder="Filter categories..." class="w-full h-7 text-xs bg-white border border-gray-200 rounded-md pl-7 pr-2 text-gray-800 placeholder:text-gray-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20">
+      </div>
+    </div>
+    <!-- Tree -->
+    <div id="treeContainer" class="flex-1 overflow-y-auto px-1 pb-2"></div>
+    <!-- Bottom buttons -->
+    <div class="p-2 flex gap-1 border-t border-gray-200">
+      <button class="text-[10px] border border-gray-200 px-2 py-1 rounded-md text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex-1">+ Category</button>
+      <button class="text-[10px] border border-gray-200 px-2 py-1 rounded-md text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex-1">+ Subcategory</button>
+    </div>
+  </div>
+
+  <!-- DUAL PREVIEW AREA -->
+  <div id="previewArea" class="flex-1 flex gap-3 p-3 items-start overflow-auto bg-gray-50">
+    <!-- Wide (Tablet) Preview -->
+    <div class="flex flex-col gap-1 flex-[65] min-w-0">
+      <span class="text-[10px] uppercase tracking-widest text-gray-500 font-medium">Wide (Tablet)</span>
+      <div id="widePreview" class="border border-gray-200 bg-white rounded-lg overflow-hidden flex shadow-sm" style="min-height:420px;">
+        <!-- Left: parent categories sidebar -->
+        <div id="wideCatSidebar" class="w-28 shrink-0 border-r border-gray-200 bg-gray-50 overflow-y-auto flex flex-col py-1"></div>
+        <!-- Right: subcategory pills + article grid -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <div id="wideSubcatBar" class="flex overflow-x-auto gap-1 px-2 py-1.5 border-b border-gray-200 bg-gray-50 min-h-[28px]"></div>
+          <div id="wideGrid" class="grid grid-cols-4 gap-1 p-2 flex-1 content-start"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Mobile Preview -->
+    <div class="flex flex-col gap-1 flex-[35] min-w-0 max-w-[280px]">
+      <span class="text-[10px] uppercase tracking-widest text-gray-500 font-medium">Mobile</span>
+      <div id="mobilePreview" class="border border-gray-200 bg-white rounded-xl overflow-hidden flex flex-col shadow-sm" style="max-width:260px;min-height:540px;">
+        <div id="mobileTabBar" class="flex overflow-x-auto border-b border-gray-200 bg-gray-50"></div>
+        <div id="mobileSubcatBar" class="hidden flex overflow-x-auto gap-1 px-2 py-1 border-b border-gray-200 bg-white"></div>
+        <div id="mobileGrid" class="grid grid-cols-2 gap-0.5 p-1.5 flex-1 content-start"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROPERTY INSPECTOR -->
+  <div id="inspector" class="w-72 bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto">
+    <div class="p-3 border-b border-gray-200">
+      <h3 class="text-xs font-medium text-gray-800 font-headline">Properties</h3>
+    </div>
+    <div id="inspectorContent" class="flex-1 overflow-y-auto"></div>
+  </div>
+
+</div>
+
+<!-- STATUS BAR -->
+<div class="h-7 min-h-[28px] bg-gray-50 border-t border-gray-200 flex items-center px-3 justify-between text-[10px] text-gray-500 select-none">
+  <div id="statusPath" class="flex items-center gap-1">
+    <span>Restaurant AB</span>
+    <span class="material-symbols-outlined xs">chevron_right</span>
+    <span>Company</span>
+  </div>
+  <div id="statusSaved" class="text-green-600">All changes saved</div>
+  <div class="flex items-center gap-2">
+    <span class="kbd">Ctrl+S</span>
+    <span class="kbd">Ctrl+Z</span>
+    <span class="kbd">Ctrl+B</span>
+    <span class="kbd">?</span>
+  </div>
+</div>
+
+<!-- SELECT ARTICLES SIDE SHEET -->
+<div id="saBackdrop" class="sa-backdrop"></div>
+<div id="saSheet" class="sa-sheet">
+  <div class="px-5 pt-5 pb-3 border-b border-gray-200 shrink-0">
+    <div class="flex items-center justify-between mb-1">
+      <h2 class="text-sm font-semibold text-gray-800 font-headline">Select articles</h2>
+      <button id="saCloseX" class="material-symbols-outlined text-gray-400 hover:text-gray-600 cursor-pointer" style="font-size:20px;">close</button>
+    </div>
+    <div id="saCategoryName" class="text-xs text-gray-500 mb-3"></div>
+    <div class="relative mb-3">
+      <span class="material-symbols-outlined xs absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+      <input id="saSearchInput" type="text" placeholder="Search articles..." class="w-full h-8 text-xs bg-white border border-gray-200 rounded-md pl-8 pr-8 text-gray-800 placeholder:text-gray-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20">
+      <button id="saSearchClear" class="material-symbols-outlined xs absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer hidden" style="font-size:14px;">close</button>
+    </div>
+    <div class="flex items-center justify-between">
+      <button id="saToggleAll" class="text-[11px] text-primary hover:underline cursor-pointer">Select all</button>
+      <span id="saSelectionCount" class="text-[11px] text-gray-400"></span>
+    </div>
+  </div>
+  <div class="flex-1 overflow-y-auto" id="saTableContainer"></div>
+  <div class="px-5 py-3 border-t border-gray-200 flex items-center justify-end gap-2 shrink-0 bg-white">
+    <button id="saCancelBtn" class="px-4 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+    <button id="saConfirmBtn" class="px-4 py-1.5 text-xs font-medium text-white rounded-md hover:opacity-90 transition-colors cursor-pointer" style="background:#624fa6;">Confirm</button>
+  </div>
+</div>
+
+<!-- KEYBOARD SHORTCUTS MODAL -->
+<div id="shortcutsModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 hidden items-center justify-center">
+  <div class="bg-white border border-gray-200 rounded-xl p-5 w-80 shadow-xl">
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="text-sm font-medium font-headline text-gray-800">Keyboard Shortcuts</h3>
+      <button id="closeShortcuts" class="material-symbols-outlined sm text-gray-400 hover:text-gray-600 cursor-pointer">close</button>
+    </div>
+    <div class="space-y-2 text-xs text-gray-600">
+      <div class="flex justify-between"><span>Toggle sidebar</span><span class="kbd">Ctrl+B</span></div>
+      <div class="flex justify-between"><span>Save changes</span><span class="kbd">Ctrl+S</span></div>
+      <div class="flex justify-between"><span>Undo</span><span class="kbd">Ctrl+Z</span></div>
+      <div class="flex justify-between"><span>Focus filter</span><span class="kbd">Ctrl+F</span></div>
+      <div class="flex justify-between"><span>Show shortcuts</span><span class="kbd">?</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// MOCK DATA
+// ═══════════════════════════════════════════════
+const mockData = {
+  company: { name: "Restaurant AB" },
+  costCenters: [
+    { id: "cc1", name: "Main Restaurant", registers: [
+      { id: "pos1", name: "Bar Register" },
+      { id: "pos2", name: "Floor Register" }
+    ]},
+    { id: "cc2", name: "Terrace", registers: [
+      { id: "pos3", name: "Terrace Main" },
+      { id: "pos4", name: "Terrace Bar" }
+    ]}
+  ],
+  categories: [
+    { id: "cat1", name: "Sandwiches", color: "#e67e22", active: true, children: [], articles: [
+      { id: "a1", name: "Club Sandwich", price: 125, productGroup: "Mat", articleNr: "1001", created: "2024-06-12" },
+      { id: "a2", name: "BLT", price: 95, productGroup: "Mat", articleNr: "", created: "2024-06-12" },
+      { id: "a3", name: "Veggie Wrap", price: 110, productGroup: "Mat", articleNr: "", created: "2024-08-03" },
+      { id: "a4", name: "Tuna Melt", price: 105, productGroup: "Mat", articleNr: "1004", created: "2024-09-15" },
+      { id: "a5", name: "Grilled Cheese", price: 85, productGroup: "Mat", articleNr: "", created: "2025-01-28" }
+    ]},
+    { id: "cat2", name: "Pizza", color: "#27ae60", active: true, children: [
+      { id: "sub2a", name: "Classic Pizza", color: "#2ecc71", active: true, articles: [
+        { id: "a6", name: "Margherita", price: 120, productGroup: "Mat", articleNr: "", created: "2023-11-05" },
+        { id: "a7", name: "Quattro Formaggi", price: 145, productGroup: "Mat", articleNr: "", created: "2023-11-05" }
+      ]},
+      { id: "sub2b", name: "Special Pizza", color: "#1abc9c", active: true, articles: [
+        { id: "a8", name: "Diavola", price: 140, productGroup: "Mat", articleNr: "", created: "2024-02-20" },
+        { id: "a9", name: "Pizza Bianca", price: 170, productGroup: "Mat", articleNr: "1009", created: "2024-02-20" }
+      ]}
+    ], articles: []},
+    { id: "cat3", name: "Appetizers", color: "#d4780a", active: true, children: [], articles: [
+      { id: "a10", name: "Antipasto del Magazzino", price: 241.50, productGroup: "Mat", articleNr: "", created: "2023-05-10" },
+      { id: "a11", name: "Vitello Tonnato", price: 185, productGroup: "Mat", articleNr: "", created: "2023-05-10" },
+      { id: "a12", name: "Bruschette Paesane", price: 165, productGroup: "Mat", articleNr: "", created: "2023-07-22" },
+      { id: "a13", name: "Olive Italiane", price: 95, productGroup: "Mat", articleNr: "", created: "2024-01-14" },
+      { id: "a14", name: "Prosciutto e grissini", price: 125, productGroup: "Mat", articleNr: "1014", created: "2024-01-14" },
+      { id: "a15", name: "Chips di Grana", price: 90, productGroup: "Mat", articleNr: "", created: "2024-03-30" },
+      { id: "a16", name: "Kvällens Antipasti", price: 750, productGroup: "Mat", articleNr: "", created: "2025-02-18" },
+      { id: "a17", name: "Charkbricka", price: 80, productGroup: "Mat", articleNr: "", created: "2025-06-01" }
+    ]},
+    { id: "cat4", name: "Pasta", color: "#f1c40f", active: true, children: [], articles: [
+      { id: "a18", name: "Carbonara", price: 155, productGroup: "Mat", articleNr: "", created: "2023-04-08" },
+      { id: "a19", name: "Bolognese", price: 145, productGroup: "Mat", articleNr: "", created: "2023-04-08" },
+      { id: "a20", name: "Pesto Genovese", price: 135, productGroup: "Mat", articleNr: "", created: "2023-09-12" },
+      { id: "a21", name: "Cacio e Pepe", price: 140, productGroup: "Mat", articleNr: "", created: "2024-11-25" }
+    ]},
+    { id: "cat5", name: "Burgers", color: "#3498db", active: true, children: [], articles: [
+      { id: "a22", name: "Classic Burger", price: 165, productGroup: "Mat", articleNr: "1022", created: "2024-05-17" },
+      { id: "a23", name: "Halloumi Burger", price: 155, productGroup: "Mat", articleNr: "", created: "2024-05-17" },
+      { id: "a24", name: "Double Smash", price: 195, productGroup: "Mat", articleNr: "", created: "2025-03-10" }
+    ]},
+    { id: "cat6", name: "Drinks", color: "#9b59b6", active: true, children: [
+      { id: "sub6a", name: "Hot Drinks", color: "#8e44ad", active: true, articles: [
+        { id: "a25", name: "Espresso", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-03-01" },
+        { id: "a26", name: "Cappuccino", price: 49, productGroup: "Dryck", articleNr: "", created: "2023-03-01" },
+        { id: "a27", name: "Latte", price: 55, productGroup: "Dryck", articleNr: "", created: "2023-03-01" },
+        { id: "a28", name: "Tea", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-06-15" }
+      ]},
+      { id: "sub6b", name: "Cold Drinks", color: "#2980b9", active: true, articles: [
+        { id: "a29", name: "Coca-Cola", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-03-01" },
+        { id: "a30", name: "Sparkling Water", price: 29, productGroup: "Dryck", articleNr: "", created: "2023-03-01" },
+        { id: "a31", name: "Juice", price: 45, productGroup: "Dryck", articleNr: "", created: "2024-04-22" }
+      ]},
+      { id: "sub6c", name: "Beer & Wine", color: "#c0392b", active: false, articles: [
+        { id: "a32", name: "IPA", price: 79, productGroup: "Dryck", articleNr: "", created: "2024-10-05" },
+        { id: "a33", name: "Lager", price: 69, productGroup: "Dryck", articleNr: "", created: "2024-10-05" },
+        { id: "a34", name: "House Red", price: 89, productGroup: "Dryck", articleNr: "", created: "2024-10-05" },
+        { id: "a35", name: "House White", price: 89, productGroup: "Dryck", articleNr: "", created: "2024-10-05" },
+        { id: "a36", name: "Prosecco", price: 95, productGroup: "Dryck", articleNr: "", created: "2025-12-20" }
+      ]}
+    ], articles: []},
+    { id: "cat7", name: "Desserts", color: "#795548", active: true, children: [], articles: [
+      { id: "a37", name: "Tiramisu", price: 95, productGroup: "Mat", articleNr: "", created: "2023-08-14" },
+      { id: "a38", name: "Panna Cotta", price: 85, productGroup: "Mat", articleNr: "", created: "2023-08-14" },
+      { id: "a39", name: "Gelato", price: 65, productGroup: "Mat", articleNr: "", created: "2025-04-02" }
+    ]}
+  ],
+  unassignedArticles: [
+    { id: "u1", name: "Gift card 10% discount", price: 1000, productGroup: "Gift cards", articleNr: "", created: "2024-04-18" },
+    { id: "u2", name: "Gift card OPEN PRICE", price: 0, productGroup: "Gift cards", articleNr: "", created: "2024-04-16" },
+    { id: "u3", name: "Voucher 100", price: 100, productGroup: "Gift cards", articleNr: "", created: "2026-03-25" },
+    { id: "u4", name: "Voucher 200", price: 200, productGroup: "Gift cards", articleNr: "", created: "2026-03-25" },
+    { id: "u5", name: "Voucher 500", price: 500, productGroup: "Gift cards", articleNr: "", created: "2026-03-25" }
+  ]
+};
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+const state = {
+  sidebarExpanded: false,
+  selectedCategoryId: 'cat3', // Appetizers
+  expandedNodes: new Set(['cat2', 'cat6']),
+  scope: 'company', // company | cc | cr
+  selectedCC: null,
+  selectedCR: null,
+  treeFilter: '',
+  inspectorSections: { category: true, wide: true, mobile: true, articles: false, inheritance: false },
+  inheritLocked: false,
+  selectArticlesOpen: false,
+  selectArticlesSort: { field: 'name', dir: 'asc' },
+  selectArticlesSearch: '',
+  selectArticlesSelection: new Set(),
+  wideLayout: { cols: 4, rowH: 5 },
+  mobileLayout: { cols: 2, rowH: 4 },
+  hoveredArticleId: null,
+};
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function findCategory(id, cats = mockData.categories) {
+  for (const c of cats) {
+    if (c.id === id) return c;
+    if (c.children) {
+      const found = findCategory(id, c.children);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function getArticlesForCategory(cat) {
+  if (!cat) return [];
+  if (cat.articles && cat.articles.length > 0) return cat.articles;
+  if (cat.children && cat.children.length > 0) {
+    return cat.children.flatMap(c => c.articles || []);
+  }
+  return [];
+}
+
+function getAllArticles() {
+  const all = [];
+  function walk(cats) {
+    for (const c of cats) {
+      if (c.articles) all.push(...c.articles);
+      if (c.children) walk(c.children);
+    }
+  }
+  walk(mockData.categories);
+  return all;
+}
+
+function countArticles(cat) {
+  let count = (cat.articles || []).length;
+  if (cat.children) cat.children.forEach(c => count += countArticles(c));
+  return count;
+}
+
+// Convert row height level (1-10) to pixels
+function rowHeightToPx(level) {
+  return 28 + (level - 1) * 8; // 28px at level 1, 100px at level 10
+}
+
+function formatPrice(p) {
+  return p % 1 === 0 ? p + ' kr' : p.toFixed(2).replace('.', ',') + ' kr';
+}
+
+function formatPriceComma(p) {
+  return p % 1 === 0 ? p + ',00' : p.toFixed(2).replace('.', ',');
+}
+
+function matchesFilter(name, filter) {
+  return name.toLowerCase().includes(filter.toLowerCase());
+}
+
+// ═══════════════════════════════════════════════
+// RENDER: CATEGORY TREE
+// ═══════════════════════════════════════════════
+function renderTree() {
+  const container = document.getElementById('treeContainer');
+  const filter = state.treeFilter;
+  let html = '';
+
+  function shouldShow(cat) {
+    if (!filter) return true;
+    if (matchesFilter(cat.name, filter)) return true;
+    if (cat.children) return cat.children.some(c => shouldShow(c));
+    return false;
+  }
+
+  function renderNode(cat, depth = 0, parentId = null) {
+    if (!shouldShow(cat)) return '';
+    const hasChildren = cat.children && cat.children.length > 0;
+    const expanded = state.expandedNodes.has(cat.id);
+    const selected = state.selectedCategoryId === cat.id;
+    const inactive = !cat.active;
+    const pl = depth * 16 + 8;
+    const artCount = countArticles(cat);
+    const catType = depth === 0 ? 'parent' : 'sub';
+
+    let cls = 'cat-tree-item flex items-center gap-1.5 py-1.5 cursor-pointer transition-colors group';
+    if (selected) cls += ' bg-purple-50 border-l-2 border-primary text-gray-800';
+    else cls += ' hover:bg-gray-50 border-l-2 border-transparent text-gray-700';
+    if (inactive) cls += ' opacity-40';
+
+    let s = `<div class="${cls}" style="padding-left:${pl}px;padding-right:8px" draggable="true" data-cat-id="${cat.id}" data-cat-type="${catType}"${parentId ? ` data-parent-id="${parentId}"` : ''}>`;
+    // Drag handle
+    s += `<span class="material-symbols-outlined xs text-gray-300 drag-handle shrink-0">drag_indicator</span>`;
+    // Triangle
+    if (hasChildren) {
+      s += `<span class="tree-triangle ${expanded ? 'expanded' : ''}" data-toggle="${cat.id}">\u25B6</span>`;
+    } else {
+      s += `<span style="width:12px" class="shrink-0"></span>`;
+    }
+    // Color dot
+    s += `<span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:${cat.color}"></span>`;
+    // Name
+    const nameSize = depth === 0 ? 'text-xs font-medium' : 'text-[11px]';
+    s += `<span class="${nameSize} truncate flex-1 ${inactive ? 'line-through' : ''}">${cat.name}</span>`;
+    // Count
+    s += `<span class="bg-gray-100 text-[10px] px-1.5 rounded text-gray-500 shrink-0">${artCount}</span>`;
+    s += `</div>`;
+
+    if (hasChildren && expanded) {
+      cat.children.forEach(child => { s += renderNode(child, depth + 1, cat.id); });
+    }
+    return s;
+  }
+
+  mockData.categories.forEach(cat => { html += renderNode(cat, 0); });
+  container.innerHTML = html;
+
+  // Event listeners
+  container.querySelectorAll('[data-cat-id]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.classList.contains('tree-triangle')) return;
+      state.selectedCategoryId = el.dataset.catId;
+      renderTree();
+      renderPreviews();
+      renderInspector();
+    });
+  });
+  container.querySelectorAll('.tree-triangle').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = el.dataset.toggle;
+      if (state.expandedNodes.has(id)) state.expandedNodes.delete(id);
+      else state.expandedNodes.add(id);
+      renderTree();
+    });
+  });
+
+  // Drag and drop reordering
+  bindTreeDragAndDrop(container);
+}
+
+// ═══════════════════════════════════════════════
+// DRAG AND DROP: CATEGORY TREE REORDER
+// ═══════════════════════════════════════════════
+let dragState = { draggedId: null, draggedType: null, draggedParentId: null };
+
+function bindTreeDragAndDrop(container) {
+  const items = container.querySelectorAll('.cat-tree-item');
+
+  items.forEach(el => {
+    // Only allow drag from the handle
+    el.addEventListener('mousedown', (e) => {
+      if (!e.target.classList.contains('drag-handle')) {
+        el.setAttribute('draggable', 'false');
+      } else {
+        el.setAttribute('draggable', 'true');
+      }
+    });
+    el.addEventListener('mouseup', () => {
+      el.setAttribute('draggable', 'true');
+    });
+
+    el.addEventListener('dragstart', (e) => {
+      // Don't drag if started from triangle
+      if (e.target.classList.contains('tree-triangle')) { e.preventDefault(); return; }
+      dragState.draggedId = el.dataset.catId;
+      dragState.draggedType = el.dataset.catType;
+      dragState.draggedParentId = el.dataset.parentId || null;
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', el.dataset.catId);
+      // Set drag image with slight offset
+      if (e.dataTransfer.setDragImage) {
+        e.dataTransfer.setDragImage(el, 20, el.offsetHeight / 2);
+      }
+    });
+
+    el.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (!dragState.draggedId) return;
+      const targetId = el.dataset.catId;
+      const targetType = el.dataset.catType;
+      const targetParentId = el.dataset.parentId || null;
+
+      // Enforce: parents only reorder among parents, subs only within same parent
+      if (dragState.draggedType === 'parent' && targetType !== 'parent') return;
+      if (dragState.draggedType === 'sub' && (targetType !== 'sub' || targetParentId !== dragState.draggedParentId)) return;
+      if (targetId === dragState.draggedId) return;
+
+      // Determine above/below based on mouse position within the element
+      const rect = el.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      clearDropIndicators();
+      if (e.clientY < midY) {
+        el.classList.add('drop-above');
+      } else {
+        el.classList.add('drop-below');
+      }
+    });
+
+    el.addEventListener('dragleave', () => {
+      el.classList.remove('drop-above', 'drop-below');
+    });
+
+    el.addEventListener('drop', (e) => {
+      e.preventDefault();
+      clearDropIndicators();
+      if (!dragState.draggedId) return;
+      const targetId = el.dataset.catId;
+      const targetType = el.dataset.catType;
+      const targetParentId = el.dataset.parentId || null;
+
+      // Enforce same constraints
+      if (dragState.draggedType === 'parent' && targetType !== 'parent') return;
+      if (dragState.draggedType === 'sub' && (targetType !== 'sub' || targetParentId !== dragState.draggedParentId)) return;
+      if (targetId === dragState.draggedId) return;
+
+      // Determine above/below
+      const rect = el.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      const insertAfter = e.clientY >= midY;
+
+      // Get the array to reorder
+      let arr;
+      if (dragState.draggedType === 'parent') {
+        arr = mockData.categories;
+      } else {
+        const parent = findCategory(dragState.draggedParentId);
+        if (!parent || !parent.children) return;
+        arr = parent.children;
+      }
+
+      // Find indices
+      const fromIdx = arr.findIndex(c => c.id === dragState.draggedId);
+      const toIdx = arr.findIndex(c => c.id === targetId);
+      if (fromIdx === -1 || toIdx === -1) return;
+
+      // Remove dragged item
+      const [item] = arr.splice(fromIdx, 1);
+      // Recalculate target index after removal
+      let newIdx = arr.findIndex(c => c.id === targetId);
+      if (newIdx === -1) { arr.push(item); } // fallback
+      else {
+        if (insertAfter) newIdx += 1;
+        arr.splice(newIdx, 0, item);
+      }
+
+      // Re-render everything
+      renderTree();
+      renderPreviews();
+      renderInspector();
+      triggerSave();
+    });
+
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      clearDropIndicators();
+      dragState = { draggedId: null, draggedType: null, draggedParentId: null };
+    });
+  });
+}
+
+function clearDropIndicators() {
+  document.querySelectorAll('.cat-tree-item.drop-above').forEach(el => el.classList.remove('drop-above'));
+  document.querySelectorAll('.cat-tree-item.drop-below').forEach(el => el.classList.remove('drop-below'));
+}
+
+// ═══════════════════════════════════════════════
+// RENDER: DUAL PREVIEWS
+// ═══════════════════════════════════════════════
+function renderPreviews() {
+  renderWideCatSidebar();
+  renderWideSubcatBar();
+  renderMobileTabBar();
+  renderWideGrid();
+  renderMobileGrid();
+}
+
+function getParentCategory(catId) {
+  for (const c of mockData.categories) {
+    if (c.id === catId) return c;
+    if (c.children && c.children.some(ch => ch.id === catId)) return c;
+  }
+  return null;
+}
+
+function renderWideCatSidebar() {
+  const sidebar = document.getElementById('wideCatSidebar');
+  const selectedCat = findCategory(state.selectedCategoryId);
+  const parentCat = getParentCategory(state.selectedCategoryId);
+
+  let html = '';
+  mockData.categories.forEach(cat => {
+    const isSelected = cat.id === state.selectedCategoryId ||
+      (parentCat && parentCat.id === cat.id);
+    const inactive = !cat.active;
+    let cls = 'flex items-center gap-1.5 px-2 py-2 text-[10px] cursor-pointer transition-colors border-l-2 ';
+    if (isSelected) cls += 'bg-white border-current font-medium text-gray-800';
+    else cls += 'border-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-700';
+    if (inactive) cls += ' opacity-30';
+    html += `<button class="${cls}" style="${isSelected ? 'border-color:'+cat.color+';color:'+cat.color : ''}" data-wide-cat="${cat.id}">
+      <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:${cat.color}"></span>
+      <span class="truncate">${cat.name}</span>
+    </button>`;
+  });
+  sidebar.innerHTML = html;
+
+  sidebar.querySelectorAll('[data-wide-cat]').forEach(el => {
+    el.addEventListener('click', () => {
+      const cat = findCategory(el.dataset.wideCat);
+      // If it has children, select the first child; otherwise select the parent
+      if (cat.children && cat.children.length > 0) {
+        state.selectedCategoryId = cat.children[0].id;
+      } else {
+        state.selectedCategoryId = cat.id;
+      }
+      renderTree();
+      renderPreviews();
+      renderInspector();
+    });
+  });
+}
+
+function renderWideSubcatBar() {
+  const bar = document.getElementById('wideSubcatBar');
+  const parentCat = getParentCategory(state.selectedCategoryId);
+
+  if (!parentCat || !parentCat.children || parentCat.children.length === 0) {
+    bar.innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  parentCat.children.forEach(sub => {
+    const isSelected = sub.id === state.selectedCategoryId;
+    const inactive = !sub.active;
+    let cls = 'shrink-0 px-2.5 py-1 text-[10px] rounded-full whitespace-nowrap cursor-pointer transition-all border ';
+    if (isSelected) cls += 'text-white font-medium shadow-sm';
+    else cls += 'bg-white text-gray-600 border-gray-200 hover:bg-gray-100';
+    if (inactive) cls += ' opacity-30';
+    html += `<button class="${cls}" style="${isSelected ? 'background:'+sub.color+';border-color:'+sub.color : ''}" data-wide-sub="${sub.id}">${sub.name}</button>`;
+  });
+  bar.innerHTML = html;
+
+  bar.querySelectorAll('[data-wide-sub]').forEach(el => {
+    el.addEventListener('click', () => {
+      state.selectedCategoryId = el.dataset.wideSub;
+      renderTree();
+      renderPreviews();
+      renderInspector();
+    });
+  });
+}
+
+function renderMobileTabBar() {
+  const cats = mockData.categories;
+  const parentCat = getParentCategory(state.selectedCategoryId);
+
+  let html = '';
+  cats.forEach(cat => {
+    const isSelected = cat.id === state.selectedCategoryId ||
+      (parentCat && parentCat.id === cat.id);
+    let cls = 'shrink-0 px-2.5 py-1.5 text-[10px] whitespace-nowrap border-b-2 transition-colors cursor-pointer ';
+    if (isSelected) cls += 'border-current text-gray-800 font-medium';
+    else cls += 'border-transparent text-gray-400 hover:text-gray-600';
+    if (!cat.active) cls += ' opacity-30';
+    html += `<button class="${cls}" style="color:${isSelected ? cat.color : ''};border-color:${isSelected ? cat.color : 'transparent'}" data-mobile-cat="${cat.id}">${cat.name}</button>`;
+  });
+  document.getElementById('mobileTabBar').innerHTML = html;
+
+  // Subcategory pills for mobile
+  const subBar = document.getElementById('mobileSubcatBar');
+  if (parentCat && parentCat.children && parentCat.children.length > 0) {
+    subBar.classList.remove('hidden');
+    subBar.classList.add('flex');
+    let subHtml = '';
+    parentCat.children.forEach(sub => {
+      const isSelected = sub.id === state.selectedCategoryId;
+      let cls = 'shrink-0 px-2 py-0.5 text-[9px] rounded-full whitespace-nowrap cursor-pointer transition-all border ';
+      if (isSelected) cls += 'text-white font-medium';
+      else cls += 'bg-white text-gray-500 border-gray-200 hover:bg-gray-100';
+      if (!sub.active) cls += ' opacity-30';
+      subHtml += `<button class="${cls}" style="${isSelected ? 'background:'+sub.color+';border-color:'+sub.color : ''}" data-mobile-sub="${sub.id}">${sub.name}</button>`;
+    });
+    subBar.innerHTML = subHtml;
+  } else {
+    subBar.classList.add('hidden');
+    subBar.classList.remove('flex');
+    subBar.innerHTML = '';
+  }
+
+  // Event listeners
+  document.querySelectorAll('[data-mobile-cat]').forEach(el => {
+    el.addEventListener('click', () => {
+      const cat = findCategory(el.dataset.mobileCat);
+      if (cat.children && cat.children.length > 0) {
+        state.selectedCategoryId = cat.children[0].id;
+      } else {
+        state.selectedCategoryId = cat.id;
+      }
+      renderTree();
+      renderPreviews();
+      renderInspector();
+    });
+  });
+  document.querySelectorAll('[data-mobile-sub]').forEach(el => {
+    el.addEventListener('click', () => {
+      state.selectedCategoryId = el.dataset.mobileSub;
+      renderTree();
+      renderPreviews();
+      renderInspector();
+    });
+  });
+}
+
+function renderWideGrid() {
+  const cat = findCategory(state.selectedCategoryId);
+  const articles = getArticlesForCategory(cat);
+  const color = cat ? cat.color : '#e5e7eb';
+  const cols = state.wideLayout.cols;
+  const rowH = rowHeightToPx(state.wideLayout.rowH);
+  const grid = document.getElementById('wideGrid');
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.style.gap = '4px';
+
+  // Fill to at least cols * 3 rows
+  const totalSlots = Math.max(articles.length, cols * 3);
+  let html = '';
+  for (let i = 0; i < totalSlots; i++) {
+    if (i < articles.length) {
+      const a = articles[i];
+      html += `<div class="rounded-md p-2 cursor-pointer transition-all hover:opacity-90 article-tile text-white shadow-sm"
+        style="min-height:${rowH}px;background:${color}"
+        data-article-id="${a.id}"
+        onmouseenter="highlightArticle('${a.id}')"
+        onmouseleave="unhighlightArticle('${a.id}')">
+        <div class="text-[11px] truncate font-medium">${a.name}</div>
+        <div class="text-[10px] text-white/80 mt-0.5">${formatPrice(a.price)}</div>
+      </div>`;
+    } else {
+      html += `<div class="border border-dashed border-gray-200 rounded-md flex items-center justify-center cursor-pointer hover:border-gray-300 transition-colors"
+        style="min-height:${rowH}px">
+        <span class="text-[10px] text-gray-300">+</span>
+      </div>`;
+    }
+  }
+  grid.innerHTML = html;
+}
+
+function renderMobileGrid() {
+  const cat = findCategory(state.selectedCategoryId);
+  const articles = getArticlesForCategory(cat);
+  const color = cat ? cat.color : '#e5e7eb';
+  const cols = state.mobileLayout.cols;
+  const rowH = rowHeightToPx(state.mobileLayout.rowH);
+  const grid = document.getElementById('mobileGrid');
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.style.gap = '2px';
+
+  const totalSlots = Math.max(articles.length, cols * 3);
+  let html = '';
+  for (let i = 0; i < totalSlots; i++) {
+    if (i < articles.length) {
+      const a = articles[i];
+      html += `<div class="rounded-md p-1.5 cursor-pointer transition-all hover:opacity-90 article-tile text-white shadow-sm"
+        style="min-height:${rowH}px;background:${color}"
+        data-article-id="${a.id}"
+        onmouseenter="highlightArticle('${a.id}')"
+        onmouseleave="unhighlightArticle('${a.id}')">
+        <div class="text-[10px] truncate font-medium">${a.name}</div>
+        <div class="text-[9px] text-white/80 mt-0.5">${formatPrice(a.price)}</div>
+      </div>`;
+    } else {
+      html += `<div class="border border-dashed border-gray-200 rounded-md flex items-center justify-center"
+        style="min-height:${rowH}px">
+        <span class="text-[9px] text-gray-300">+</span>
+      </div>`;
+    }
+  }
+  grid.innerHTML = html;
+}
+
+// Cross-highlight
+function highlightArticle(id) {
+  state.hoveredArticleId = id;
+  document.querySelectorAll(`.article-tile[data-article-id="${id}"]`).forEach(el => {
+    el.classList.add('cross-highlight');
+  });
+}
+function unhighlightArticle(id) {
+  state.hoveredArticleId = null;
+  document.querySelectorAll(`.article-tile[data-article-id="${id}"]`).forEach(el => {
+    el.classList.remove('cross-highlight');
+  });
+}
+
+// ═══════════════════════════════════════════════
+// RENDER: PROPERTY INSPECTOR
+// ═══════════════════════════════════════════════
+function renderInspector() {
+  const cat = findCategory(state.selectedCategoryId);
+  if (!cat) { document.getElementById('inspectorContent').innerHTML = ''; return; }
+  const articles = getArticlesForCategory(cat);
+  const locked = state.inheritLocked;
+
+  function sectionHeader(key, label) {
+    const open = state.inspectorSections[key];
+    return `<div class="flex items-center gap-1 px-3 py-2 cursor-pointer hover:bg-gray-50 transition-colors select-none border-b border-gray-100" data-section-toggle="${key}">
+      <span class="tree-triangle ${open ? 'expanded' : ''}" style="font-size:8px">\u25B6</span>
+      <span class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">${label}</span>
+    </div>`;
+  }
+
+  const lockedCls = locked ? ' opacity-50 pointer-events-none' : '';
+
+  let html = '';
+
+  // Category Section
+  html += sectionHeader('category', 'Category');
+  if (state.inspectorSections.category) {
+    html += `<div class="px-3 pb-3 space-y-2${lockedCls}">
+      <div>
+        <label class="text-[10px] text-gray-500 block mb-0.5">Name</label>
+        <input id="propName" type="text" value="${cat.name}" class="w-full h-6 text-xs bg-white border border-gray-200 rounded-md px-2 text-gray-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20">
+      </div>
+      <div>
+        <label class="text-[10px] text-gray-500 block mb-0.5">Color</label>
+        <div class="flex items-center gap-2">
+          <span class="w-4 h-4 rounded-md shrink-0" style="background:${cat.color}"></span>
+          <input id="propColor" type="text" value="${cat.color}" class="w-20 h-5 text-[10px] bg-white border border-gray-200 rounded-md px-1.5 text-gray-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-mono">
+        </div>
+        <div class="flex gap-1 mt-1.5">
+          ${['#e67e22','#27ae60','#d4780a','#f1c40f','#3498db','#9b59b6','#c0392b','#795548'].map(c =>
+            `<button class="w-4 h-4 rounded-md border ${c === cat.color ? 'border-primary ring-1 ring-primary/30' : 'border-gray-200'} hover:scale-110 transition-transform color-swatch" data-color="${c}" style="background:${c}"></button>`
+          ).join('')}
+        </div>
+      </div>
+      <div class="flex items-center justify-between">
+        <label class="text-[10px] text-gray-500">Active</label>
+        <div id="propActive" class="toggle-switch ${cat.active ? 'active' : ''}"></div>
+      </div>
+    </div>`;
+  }
+
+  // Wide Screen Layout
+  html += sectionHeader('wide', 'Wide Screen Layout');
+  if (state.inspectorSections.wide) {
+    html += `<div class="px-3 pb-3 space-y-2${lockedCls}">
+      <p class="text-[10px] text-gray-400 italic">Applied to all categories</p>
+      ${numField('Columns', 'wideCols', state.wideLayout.cols, 1, 10)}
+      ${numField('Row height', 'wideRowH', state.wideLayout.rowH, 1, 10)}
+    </div>`;
+  }
+
+  // Mobile Screen Layout
+  html += sectionHeader('mobile', 'Mobile Screen Layout');
+  if (state.inspectorSections.mobile) {
+    html += `<div class="px-3 pb-3 space-y-2${lockedCls}">
+      <p class="text-[10px] text-gray-400 italic">Applied to all categories</p>
+      ${numField('Columns', 'mobileCols', state.mobileLayout.cols, 1, 10)}
+      ${numField('Row height', 'mobileRowH', state.mobileLayout.rowH, 1, 10)}
+    </div>`;
+  }
+
+  // Articles
+  html += sectionHeader('articles', 'Articles');
+  if (state.inspectorSections.articles) {
+    html += `<div class="px-3 pb-3${lockedCls}">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[10px] text-gray-500">${articles.length} articles assigned</span>
+      </div>
+      <button id="openSelectArticlesBtn" class="w-full py-1.5 px-3 bg-primary text-white text-[10px] font-medium rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-1 cursor-pointer">
+        <span class="material-symbols-outlined" style="font-size:14px;">edit_note</span>
+        Select articles
+      </button>
+    </div>`;
+  }
+
+  // Inheritance
+  html += sectionHeader('inheritance', 'Inheritance');
+  if (state.inspectorSections.inheritance) {
+    html += `<div class="px-3 pb-3 space-y-2">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input id="inheritCheckbox" type="checkbox" ${state.inheritLocked ? 'checked' : ''} class="w-3 h-3 accent-primary">
+        <span class="text-[10px] text-gray-500">Inherit from parent scope</span>
+      </label>
+      ${state.inheritLocked ? '<div class="text-[10px] text-gray-400 pl-5">Inheriting from: <span class="text-primary cursor-pointer hover:underline">Company</span></div>' : ''}
+    </div>`;
+  }
+
+  document.getElementById('inspectorContent').innerHTML = html;
+  bindInspectorEvents(cat);
+}
+
+function numField(label, id, value, min, max) {
+  return `<div class="flex items-center justify-between">
+    <label class="text-[10px] text-gray-500">${label}</label>
+    <div class="flex items-center border border-gray-200 rounded-md overflow-hidden">
+      <button class="w-5 h-5 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100 transition-colors num-btn" data-field="${id}" data-dir="-1">&minus;</button>
+      <input type="number" id="${id}" value="${value}" min="${min}" max="${max}" class="w-10 h-5 text-xs text-center bg-white text-gray-800 outline-none border-x border-gray-200">
+      <button class="w-5 h-5 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100 transition-colors num-btn" data-field="${id}" data-dir="1">+</button>
+    </div>
+  </div>`;
+}
+
+function bindInspectorEvents(cat) {
+  // Section toggles
+  document.querySelectorAll('[data-section-toggle]').forEach(el => {
+    el.addEventListener('click', () => {
+      const key = el.dataset.sectionToggle;
+      state.inspectorSections[key] = !state.inspectorSections[key];
+      renderInspector();
+    });
+  });
+
+  // Name
+  const nameInput = document.getElementById('propName');
+  if (nameInput) {
+    nameInput.addEventListener('input', () => {
+      cat.name = nameInput.value;
+      renderTree();
+      renderPreviews();
+      triggerSave();
+    });
+  }
+
+  // Color input
+  const colorInput = document.getElementById('propColor');
+  if (colorInput) {
+    colorInput.addEventListener('input', () => {
+      if (/^#[0-9a-fA-F]{6}$/.test(colorInput.value)) {
+        cat.color = colorInput.value;
+        renderTree();
+        renderPreviews();
+        renderInspector();
+        triggerSave();
+      }
+    });
+  }
+
+  // Color swatches
+  document.querySelectorAll('.color-swatch').forEach(el => {
+    el.addEventListener('click', () => {
+      cat.color = el.dataset.color;
+      renderTree();
+      renderPreviews();
+      renderInspector();
+      triggerSave();
+    });
+  });
+
+  // Active toggle
+  const activeToggle = document.getElementById('propActive');
+  if (activeToggle) {
+    activeToggle.addEventListener('click', () => {
+      cat.active = !cat.active;
+      renderTree();
+      renderPreviews();
+      renderInspector();
+      triggerSave();
+    });
+  }
+
+  // Number fields
+  document.querySelectorAll('.num-btn').forEach(el => {
+    el.addEventListener('click', () => {
+      const field = el.dataset.field;
+      const dir = parseInt(el.dataset.dir);
+      const input = document.getElementById(field);
+      let val = parseInt(input.value) + dir;
+      val = Math.max(parseInt(input.min), Math.min(parseInt(input.max), val));
+      input.value = val;
+      applyNumField(field, val);
+    });
+  });
+
+  ['wideCols','wideRowH','mobileCols','mobileRowH'].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.addEventListener('input', () => {
+        let val = parseInt(input.value);
+        if (!isNaN(val)) applyNumField(id, val);
+      });
+    }
+  });
+
+  // Select articles button
+  const selectArtBtn = document.getElementById('openSelectArticlesBtn');
+  if (selectArtBtn) {
+    selectArtBtn.addEventListener('click', () => openSelectArticles());
+  }
+
+  // Inheritance
+  const inheritCb = document.getElementById('inheritCheckbox');
+  if (inheritCb) {
+    inheritCb.addEventListener('change', () => {
+      state.inheritLocked = inheritCb.checked;
+      renderInspector();
+    });
+  }
+}
+
+function applyNumField(field, val) {
+  const map = {
+    wideCols: () => { state.wideLayout.cols = val; renderWideGrid(); },
+    wideRowH: () => { state.wideLayout.rowH = val; renderWideGrid(); },
+    mobileCols: () => { state.mobileLayout.cols = val; renderMobileGrid(); },
+    mobileRowH: () => { state.mobileLayout.rowH = val; renderMobileGrid(); },
+  };
+  if (map[field]) { map[field](); triggerSave(); }
+}
+
+// ═══════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════
+function toggleSidebar() {
+  state.sidebarExpanded = !state.sidebarExpanded;
+  const sb = document.getElementById('sidebar');
+  if (state.sidebarExpanded) {
+    sb.style.width = '176px'; // w-44
+  } else {
+    sb.style.width = '48px'; // w-12
+  }
+  sb.querySelectorAll('.sidebar-label').forEach(el => {
+    el.style.display = state.sidebarExpanded ? '' : 'none';
+  });
+}
+
+// Init sidebar labels hidden
+document.querySelectorAll('.sidebar-label').forEach(el => { el.style.display = 'none'; });
+
+document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+
+// Sidebar nav items
+document.querySelectorAll('.sidebar-item').forEach(el => {
+  el.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelectorAll('.sidebar-item').forEach(n => {
+      n.classList.remove('active', 'bg-primary', 'text-white', 'border-l-2', 'border-primary');
+      n.classList.add('text-gray-600');
+    });
+    el.classList.remove('text-gray-600');
+    el.classList.add('active', 'bg-primary', 'text-white', 'border-l-2', 'border-primary');
+  });
+});
+
+// ═══════════════════════════════════════════════
+// SCOPE CONTROL
+// ═══════════════════════════════════════════════
+function updateScope(scope, skipDropdown) {
+  state.scope = scope;
+  document.querySelectorAll('.scope-btn').forEach(btn => {
+    const s = btn.dataset.scope;
+    if (s === scope) {
+      btn.className = 'scope-btn text-xs px-3 py-1 rounded-md transition-all bg-primary text-white';
+    } else {
+      btn.className = 'scope-btn text-xs px-3 py-1 rounded-md transition-all text-gray-600 hover:bg-gray-50 border border-transparent';
+    }
+  });
+
+  const chip = document.getElementById('scopeChip');
+  const badge = document.getElementById('inheritanceBadge');
+
+  if (scope === 'company') {
+    chip.classList.add('hidden');
+    chip.classList.remove('flex');
+    state.selectedCC = null;
+    state.selectedCR = null;
+    badge.textContent = 'Inherited';
+    badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-200';
+    updateStatusPath();
+    hideDropdowns();
+  } else if (scope === 'cc') {
+    state.selectedCR = null;
+    if (!skipDropdown && !state.selectedCC) showDropdown('cc');
+    else if (state.selectedCC) {
+      chip.classList.remove('hidden');
+      chip.classList.add('flex');
+      document.getElementById('scopeChipText').textContent = state.selectedCC.name;
+      badge.textContent = 'Custom';
+      badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200';
+      updateStatusPath();
+    }
+  } else if (scope === 'cr') {
+    if (!skipDropdown && !state.selectedCR) showDropdown('cr');
+    else if (state.selectedCR) {
+      chip.classList.remove('hidden');
+      chip.classList.add('flex');
+      document.getElementById('scopeChipText').textContent = state.selectedCR.name;
+      badge.textContent = 'Custom';
+      badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200';
+      updateStatusPath();
+    }
+  }
+}
+
+function showDropdown(type) {
+  hideDropdowns();
+  const dd = type === 'cc' ? document.getElementById('scopeDropdownCC') : document.getElementById('scopeDropdownCR');
+  const control = document.getElementById('scopeControl');
+  const rect = control.getBoundingClientRect();
+
+  dd.style.left = rect.left + 'px';
+  dd.style.top = (rect.bottom + 4) + 'px';
+  dd.style.position = 'fixed';
+  dd.classList.remove('hidden');
+
+  let html = '';
+  if (type === 'cc') {
+    mockData.costCenters.forEach(cc => {
+      html += `<button class="w-full text-left text-xs px-3 py-1.5 hover:bg-gray-50 text-gray-600 hover:text-gray-800 transition-colors dropdown-cc-item" data-cc-id="${cc.id}">${cc.name}</button>`;
+    });
+  } else {
+    // Show registers from selected CC or all
+    const ccs = state.selectedCC ? [state.selectedCC] : mockData.costCenters;
+    ccs.forEach(cc => {
+      html += `<div class="text-[9px] uppercase tracking-wider text-gray-400 px-3 pt-2 pb-0.5 font-bold">${cc.name}</div>`;
+      (cc.registers || []).forEach(r => {
+        html += `<button class="w-full text-left text-xs px-3 py-1.5 hover:bg-gray-50 text-gray-600 hover:text-gray-800 transition-colors dropdown-cr-item" data-cr-id="${r.id}" data-cc-id="${cc.id}">${r.name}</button>`;
+      });
+    });
+  }
+  dd.innerHTML = html;
+
+  dd.querySelectorAll('.dropdown-cc-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const cc = mockData.costCenters.find(c => c.id === el.dataset.ccId);
+      state.selectedCC = cc;
+      hideDropdowns();
+      updateScope('cc', true);
+    });
+  });
+  dd.querySelectorAll('.dropdown-cr-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const ccId = el.dataset.ccId;
+      const crId = el.dataset.crId;
+      const cc = mockData.costCenters.find(c => c.id === ccId);
+      state.selectedCC = cc;
+      state.selectedCR = cc.registers.find(r => r.id === crId);
+      hideDropdowns();
+      updateScope('cr', true);
+    });
+  });
+}
+
+function hideDropdowns() {
+  document.getElementById('scopeDropdownCC').classList.add('hidden');
+  document.getElementById('scopeDropdownCR').classList.add('hidden');
+}
+
+document.querySelectorAll('.scope-btn').forEach(btn => {
+  btn.addEventListener('click', () => updateScope(btn.dataset.scope));
+});
+
+document.getElementById('scopeChipX').addEventListener('click', () => {
+  updateScope('company');
+});
+
+// Close dropdowns on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#scopeControl') && !e.target.closest('.scope-dropdown')) {
+    hideDropdowns();
+  }
+});
+
+function updateStatusPath() {
+  const el = document.getElementById('statusPath');
+  let path = mockData.company.name;
+  if (state.selectedCC) path += ` <span class="material-symbols-outlined xs">chevron_right</span> ${state.selectedCC.name}`;
+  if (state.selectedCR) path += ` <span class="material-symbols-outlined xs">chevron_right</span> ${state.selectedCR.name}`;
+  else if (!state.selectedCC) path += ` <span class="material-symbols-outlined xs">chevron_right</span> Company`;
+  el.innerHTML = path;
+}
+
+// ═══════════════════════════════════════════════
+// SELECT ARTICLES SIDE SHEET
+// ═══════════════════════════════════════════════
+function getAllArticlesFlat() {
+  const all = [];
+  function walk(cats) {
+    for (const c of cats) {
+      if (c.articles && c.articles.length > 0) {
+        c.articles.forEach(a => {
+          all.push({ ...a, catColor: c.color, catName: c.name });
+        });
+      }
+      if (c.children) walk(c.children);
+    }
+  }
+  walk(mockData.categories);
+  // Add unassigned
+  (mockData.unassignedArticles || []).forEach(a => {
+    all.push({ ...a, catColor: '#9ca3af', catName: 'Unassigned' });
+  });
+  return all;
+}
+
+function openSelectArticles() {
+  const cat = findCategory(state.selectedCategoryId);
+  if (!cat) return;
+  const articles = getArticlesForCategory(cat);
+  state.selectArticlesSelection = new Set(articles.map(a => a.id));
+  state.selectArticlesSearch = '';
+  state.selectArticlesSort = { field: 'name', dir: 'asc' };
+  state.selectArticlesOpen = true;
+
+  document.getElementById('saCategoryName').textContent = cat.name;
+  document.getElementById('saSearchInput').value = '';
+  document.getElementById('saSearchClear').classList.add('hidden');
+
+  renderSelectArticlesPanel();
+
+  // Open with animation
+  requestAnimationFrame(() => {
+    document.getElementById('saBackdrop').classList.add('open');
+    document.getElementById('saSheet').classList.add('open');
+  });
+}
+
+function closeSelectArticles() {
+  state.selectArticlesOpen = false;
+  document.getElementById('saBackdrop').classList.remove('open');
+  document.getElementById('saSheet').classList.remove('open');
+}
+
+function confirmSelectArticles() {
+  const cat = findCategory(state.selectedCategoryId);
+  if (!cat) return;
+  const allFlat = getAllArticlesFlat();
+  const selected = state.selectArticlesSelection;
+
+  // Build new articles array from selection, preserving original article data
+  const newArticles = [];
+  selected.forEach(id => {
+    const src = allFlat.find(a => a.id === id);
+    if (src) {
+      const { catColor, catName, ...artData } = src;
+      newArticles.push(artData);
+    }
+  });
+
+  // Determine where to assign: if cat has children, we skip (parent cat);
+  // otherwise assign directly to cat.articles
+  if (cat.articles !== undefined) {
+    cat.articles = newArticles;
+  }
+
+  closeSelectArticles();
+  renderInspector();
+  renderPreviews();
+  renderTree();
+  triggerSave();
+}
+
+function toggleArticleSelection(id) {
+  if (state.selectArticlesSelection.has(id)) {
+    state.selectArticlesSelection.delete(id);
+  } else {
+    state.selectArticlesSelection.add(id);
+  }
+  renderSelectArticlesPanel();
+}
+
+function sortSelectArticles(field) {
+  if (state.selectArticlesSort.field === field) {
+    state.selectArticlesSort.dir = state.selectArticlesSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    state.selectArticlesSort.field = field;
+    state.selectArticlesSort.dir = 'asc';
+  }
+  renderSelectArticlesPanel();
+}
+
+function toggleSelectAll() {
+  const allFlat = getAllArticlesFlat();
+  const q = state.selectArticlesSearch.toLowerCase();
+  const visible = allFlat.filter(a => {
+    if (!q) return true;
+    return a.name.toLowerCase().includes(q) || a.catName.toLowerCase().includes(q) || a.productGroup.toLowerCase().includes(q) || (a.articleNr && a.articleNr.includes(q));
+  });
+  const allSelected = visible.every(a => state.selectArticlesSelection.has(a.id));
+  if (allSelected) {
+    visible.forEach(a => state.selectArticlesSelection.delete(a.id));
+  } else {
+    visible.forEach(a => state.selectArticlesSelection.add(a.id));
+  }
+  renderSelectArticlesPanel();
+}
+
+function renderSelectArticlesPanel() {
+  const allFlat = getAllArticlesFlat();
+  const q = state.selectArticlesSearch.toLowerCase();
+  const sel = state.selectArticlesSelection;
+
+  // Filter
+  let filtered = allFlat;
+  if (q) {
+    filtered = allFlat.filter(a =>
+      a.name.toLowerCase().includes(q) ||
+      a.catName.toLowerCase().includes(q) ||
+      a.productGroup.toLowerCase().includes(q) ||
+      (a.articleNr && a.articleNr.includes(q))
+    );
+  }
+
+  // Sort
+  const { field, dir } = state.selectArticlesSort;
+  const mult = dir === 'asc' ? 1 : -1;
+  filtered.sort((a, b) => {
+    let va = a[field], vb = b[field];
+    if (field === 'price') return (va - vb) * mult;
+    if (field === 'created') return ((va || '') < (vb || '') ? -1 : (va || '') > (vb || '') ? 1 : 0) * mult;
+    if (field === 'catName') { va = va || ''; vb = vb || ''; }
+    if (field === 'productGroup') { va = va || ''; vb = vb || ''; }
+    if (field === 'articleNr') { va = va || ''; vb = vb || ''; }
+    if (typeof va === 'string') return va.localeCompare(vb) * mult;
+    return 0;
+  });
+
+  // Update toggle all text
+  const allSelected = filtered.length > 0 && filtered.every(a => sel.has(a.id));
+  const toggleBtn = document.getElementById('saToggleAll');
+  if (toggleBtn) toggleBtn.textContent = allSelected ? 'Deselect all' : 'Select all';
+
+  // Update count
+  const countEl = document.getElementById('saSelectionCount');
+  if (countEl) countEl.textContent = sel.size + ' selected';
+
+  // Column definitions
+  const cols = [
+    { key: 'name', label: 'Name' },
+    { key: 'catName', label: 'Category' },
+    { key: 'productGroup', label: 'Product group' },
+    { key: 'articleNr', label: 'Art.Nr' },
+    { key: 'price', label: 'Price' },
+    { key: 'created', label: 'Created' }
+  ];
+
+  function sortArrow(key) {
+    const isActive = state.selectArticlesSort.field === key;
+    const arrow = isActive ? (state.selectArticlesSort.dir === 'asc' ? '\u25B2' : '\u25BC') : '\u25B2';
+    return `<span class="sort-arrow">${arrow}</span>`;
+  }
+
+  let html = '<table class="sa-table"><thead><tr>';
+  // Checkbox column header
+  html += '<th style="width:36px;padding-left:16px;padding-right:0;cursor:default;"></th>';
+  cols.forEach(col => {
+    const isActive = state.selectArticlesSort.field === col.key;
+    html += `<th class="${isActive ? 'active-sort' : ''}" data-sa-sort="${col.key}">${col.label}${sortArrow(col.key)}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  filtered.forEach(a => {
+    const isSelected = sel.has(a.id);
+    html += `<tr class="${isSelected ? 'selected' : ''}" data-sa-row="${a.id}">`;
+    html += `<td style="width:36px;padding-left:16px;padding-right:0;"><input type="checkbox" ${isSelected ? 'checked' : ''} class="w-3.5 h-3.5 accent-primary pointer-events-none" tabindex="-1"></td>`;
+    html += `<td class="font-medium">${a.name}</td>`;
+    html += `<td><span class="sa-cat-dot" style="background:${a.catColor}"></span>${a.catName}</td>`;
+    html += `<td>${a.productGroup || ''}</td>`;
+    html += `<td class="text-gray-400">${a.articleNr || '\u2014'}</td>`;
+    html += `<td>${formatPriceComma(a.price)}</td>`;
+    html += `<td class="text-gray-400">${a.created || ''}</td>`;
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('saTableContainer').innerHTML = html;
+
+  // Bind row clicks
+  document.querySelectorAll('[data-sa-row]').forEach(el => {
+    el.addEventListener('click', () => toggleArticleSelection(el.dataset.saRow));
+  });
+
+  // Bind sort headers
+  document.querySelectorAll('[data-sa-sort]').forEach(el => {
+    el.addEventListener('click', () => sortSelectArticles(el.dataset.saSort));
+  });
+}
+
+// Wire up side sheet buttons
+document.getElementById('saBackdrop').addEventListener('click', closeSelectArticles);
+document.getElementById('saCloseX').addEventListener('click', closeSelectArticles);
+document.getElementById('saCancelBtn').addEventListener('click', closeSelectArticles);
+document.getElementById('saConfirmBtn').addEventListener('click', confirmSelectArticles);
+document.getElementById('saToggleAll').addEventListener('click', toggleSelectAll);
+document.getElementById('saSearchInput').addEventListener('input', (e) => {
+  state.selectArticlesSearch = e.target.value;
+  const clearBtn = document.getElementById('saSearchClear');
+  if (e.target.value) clearBtn.classList.remove('hidden');
+  else clearBtn.classList.add('hidden');
+  renderSelectArticlesPanel();
+});
+document.getElementById('saSearchClear').addEventListener('click', () => {
+  state.selectArticlesSearch = '';
+  document.getElementById('saSearchInput').value = '';
+  document.getElementById('saSearchClear').classList.add('hidden');
+  renderSelectArticlesPanel();
+});
+
+// ═══════════════════════════════════════════════
+// SAVE INDICATOR
+// ═══════════════════════════════════════════════
+let saveTimeout;
+function triggerSave() {
+  const el = document.getElementById('statusSaved');
+  el.textContent = 'Saving...';
+  el.className = 'text-amber-500';
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    el.textContent = 'All changes saved';
+    el.className = 'text-green-600';
+  }, 800);
+}
+
+// ═══════════════════════════════════════════════
+// TREE FILTER
+// ═══════════════════════════════════════════════
+document.getElementById('treeFilter').addEventListener('input', (e) => {
+  state.treeFilter = e.target.value;
+  renderTree();
+});
+
+// ═══════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+  // Ctrl+B: toggle sidebar
+  if (e.ctrlKey && e.key === 'b') { e.preventDefault(); toggleSidebar(); }
+  // Ctrl+S: save
+  if (e.ctrlKey && e.key === 's') { e.preventDefault(); triggerSave(); }
+  // Ctrl+F: focus filter
+  if (e.ctrlKey && e.key === 'f') {
+    e.preventDefault();
+    document.getElementById('treeFilter').focus();
+  }
+  // ?: shortcuts
+  if (e.key === '?' && !e.target.matches('input, textarea')) {
+    e.preventDefault();
+    toggleShortcutsModal();
+  }
+  // Escape: close modal/dropdowns/side sheet
+  if (e.key === 'Escape') {
+    if (state.selectArticlesOpen) { closeSelectArticles(); return; }
+    hideDropdowns();
+    document.getElementById('shortcutsModal').classList.add('hidden');
+    document.getElementById('shortcutsModal').classList.remove('flex');
+  }
+});
+
+function toggleShortcutsModal() {
+  const modal = document.getElementById('shortcutsModal');
+  if (modal.classList.contains('hidden')) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  } else {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+document.getElementById('helpBtn').addEventListener('click', toggleShortcutsModal);
+document.getElementById('closeShortcuts').addEventListener('click', toggleShortcutsModal);
+document.getElementById('shortcutsModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('shortcutsModal')) toggleShortcutsModal();
+});
+
+// ═══════════════════════════════════════════════
+// INITIAL RENDER
+// ═══════════════════════════════════════════════
+renderTree();
+renderPreviews();
+renderInspector();
+updateStatusPath();
+</script>
+</body>
+</html>

@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cash Register Layout — Clean Panels</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            primary: '#624fa6',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; margin: 0; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .icon-sm { font-size: 20px; }
+    .icon-xs { font-size: 18px; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9999px; }
+    input[type="range"] { -webkit-appearance: none; appearance: none; height: 4px; background: #e5e7eb; outline: none; border-radius: 9999px; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 9999px; background: #624fa6; cursor: pointer; }
+    /* Drag-and-drop styles */
+    .cat-row { position: relative; transition: background 0.15s; }
+    .cat-row .drag-handle { opacity: 0; transition: opacity 0.15s; cursor: grab; user-select: none; }
+    .cat-row:hover .drag-handle { opacity: 0.5; }
+    .cat-row .drag-handle:hover { opacity: 1; }
+    .cat-row.dragging { opacity: 0.4; }
+    .cat-row.drop-above::before {
+      content: ''; position: absolute; top: -1px; left: 0; right: 0; height: 2px; background: #624fa6; z-index: 10; pointer-events: none;
+    }
+    .cat-row.drop-below::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: #624fa6; z-index: 10; pointer-events: none;
+    }
+    .cat-row .drag-handle:active { cursor: grabbing; }
+  </style>
+</head>
+<body class="h-screen overflow-hidden bg-gray-100 text-gray-900">
+
+<div id="app" class="flex h-full w-full"></div>
+
+<script>
+// ─── MOCK DATA ──────────────────────────────────────────────
+const mockData = {
+  company: { name: "Restaurant AB" },
+  costCenters: [
+    { id: "cc1", name: "Main Restaurant", registers: [
+      { id: "pos1", name: "Bar Register" },
+      { id: "pos2", name: "Floor Register" }
+    ]},
+    { id: "cc2", name: "Terrace", registers: [
+      { id: "pos3", name: "Terrace Main" },
+      { id: "pos4", name: "Terrace Bar" }
+    ]}
+  ],
+  unassignedArticles: [
+    { id: "u1", name: "Gift card 10% discount", price: 1000, productGroup: "Gift cards", articleNr: "", created: "2024-04-18" },
+    { id: "u2", name: "Gift card OPEN PRICE", price: 0, productGroup: "Gift cards", articleNr: "", created: "2024-04-16" },
+    { id: "u3", name: "Voucher 100", price: 100, productGroup: "Gift cards", articleNr: "", created: "2026-03-25" },
+    { id: "u4", name: "Voucher 200", price: 200, productGroup: "Gift cards", articleNr: "", created: "2026-03-25" },
+    { id: "u5", name: "Voucher 500", price: 500, productGroup: "Gift cards", articleNr: "", created: "2026-03-25" }
+  ],
+  categories: [
+    { id: "cat1", name: "Sandwiches", color: "#e67e22", active: true, children: [], articles: [
+      { id: "a1", name: "Club Sandwich", price: 125, productGroup: "Mat", articleNr: "1001", created: "2025-01-28" },
+      { id: "a2", name: "BLT", price: 95, productGroup: "Mat", articleNr: "", created: "2025-03-12" },
+      { id: "a3", name: "Veggie Wrap", price: 110, productGroup: "Mat", articleNr: "", created: "2024-11-05" },
+      { id: "a4", name: "Tuna Melt", price: 105, productGroup: "Mat", articleNr: "1004", created: "2024-08-20" },
+      { id: "a5", name: "Grilled Cheese", price: 85, productGroup: "Mat", articleNr: "", created: "2023-06-15" }
+    ]},
+    { id: "cat2", name: "Pizza", color: "#27ae60", active: true, children: [
+      { id: "sub2a", name: "Classic Pizza", color: "#2ecc71", active: true, articles: [
+        { id: "a6", name: "Margherita", price: 120, productGroup: "Mat", articleNr: "", created: "2023-09-01" },
+        { id: "a7", name: "Quattro Formaggi", price: 145, productGroup: "Mat", articleNr: "", created: "2024-02-14" }
+      ]},
+      { id: "sub2b", name: "Special Pizza", color: "#1abc9c", active: true, articles: [
+        { id: "a8", name: "Diavola", price: 140, productGroup: "Mat", articleNr: "", created: "2024-05-22" },
+        { id: "a9", name: "Pizza Bianca", price: 170, productGroup: "Mat", articleNr: "1009", created: "2025-01-10" }
+      ]}
+    ], articles: []},
+    { id: "cat3", name: "Appetizers", color: "#d4780a", active: true, children: [], articles: [
+      { id: "a10", name: "Antipasto del Magazzino", price: 241.50, productGroup: "Mat", articleNr: "", created: "2024-03-18" },
+      { id: "a11", name: "Vitello Tonnato", price: 185, productGroup: "Mat", articleNr: "", created: "2024-07-25" },
+      { id: "a12", name: "Bruschette Paesane", price: 165, productGroup: "Mat", articleNr: "", created: "2023-12-01" },
+      { id: "a13", name: "Olive Italiane", price: 95, productGroup: "Mat", articleNr: "", created: "2023-05-30" },
+      { id: "a14", name: "Prosciutto e grissini", price: 125, productGroup: "Mat", articleNr: "1014", created: "2024-09-12" },
+      { id: "a15", name: "Chips di Grana", price: 90, productGroup: "Mat", articleNr: "", created: "2025-02-08" },
+      { id: "a16", name: "Kvällens Antipasti", price: 750, productGroup: "Mat", articleNr: "", created: "2024-01-20" },
+      { id: "a17", name: "Charkbricka", price: 80, productGroup: "Mat", articleNr: "", created: "2023-10-05" }
+    ]},
+    { id: "cat4", name: "Pasta", color: "#f1c40f", active: true, children: [], articles: [
+      { id: "a18", name: "Carbonara", price: 155, productGroup: "Mat", articleNr: "", created: "2023-08-14" },
+      { id: "a19", name: "Bolognese", price: 145, productGroup: "Mat", articleNr: "", created: "2024-04-03" },
+      { id: "a20", name: "Pesto Genovese", price: 135, productGroup: "Mat", articleNr: "", created: "2024-06-19" },
+      { id: "a21", name: "Cacio e Pepe", price: 140, productGroup: "Mat", articleNr: "", created: "2025-03-01" }
+    ]},
+    { id: "cat5", name: "Burgers", color: "#3498db", active: true, children: [], articles: [
+      { id: "a22", name: "Classic Burger", price: 165, productGroup: "Mat", articleNr: "1022", created: "2023-07-22" },
+      { id: "a23", name: "Halloumi Burger", price: 155, productGroup: "Mat", articleNr: "", created: "2024-10-30" },
+      { id: "a24", name: "Double Smash", price: 195, productGroup: "Mat", articleNr: "", created: "2025-01-15" }
+    ]},
+    { id: "cat6", name: "Drinks", color: "#9b59b6", active: true, children: [
+      { id: "sub6a", name: "Hot Drinks", color: "#8e44ad", active: true, articles: [
+        { id: "a25", name: "Espresso", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-04-10" },
+        { id: "a26", name: "Cappuccino", price: 49, productGroup: "Dryck", articleNr: "", created: "2023-04-10" },
+        { id: "a27", name: "Latte", price: 55, productGroup: "Dryck", articleNr: "", created: "2024-01-05" },
+        { id: "a28", name: "Tea", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-11-18" }
+      ]},
+      { id: "sub6b", name: "Cold Drinks", color: "#2980b9", active: true, articles: [
+        { id: "a29", name: "Coca-Cola", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-03-20" },
+        { id: "a30", name: "Sparkling Water", price: 29, productGroup: "Dryck", articleNr: "", created: "2023-03-20" },
+        { id: "a31", name: "Juice", price: 45, productGroup: "Dryck", articleNr: "", created: "2024-05-14" }
+      ]},
+      { id: "sub6c", name: "Beer & Wine", color: "#c0392b", active: false, articles: [
+        { id: "a32", name: "IPA", price: 79, productGroup: "Dryck", articleNr: "", created: "2024-02-28" },
+        { id: "a33", name: "Lager", price: 69, productGroup: "Dryck", articleNr: "", created: "2024-02-28" },
+        { id: "a34", name: "House Red", price: 89, productGroup: "Dryck", articleNr: "", created: "2023-09-15" },
+        { id: "a35", name: "House White", price: 89, productGroup: "Dryck", articleNr: "", created: "2023-09-15" },
+        { id: "a36", name: "Prosecco", price: 95, productGroup: "Dryck", articleNr: "", created: "2024-12-01" }
+      ]}
+    ], articles: []},
+    { id: "cat7", name: "Desserts", color: "#795548", active: true, children: [], articles: [
+      { id: "a37", name: "Tiramisu", price: 95, productGroup: "Mat", articleNr: "", created: "2024-06-08" },
+      { id: "a38", name: "Panna Cotta", price: 85, productGroup: "Mat", articleNr: "", created: "2024-06-08" },
+      { id: "a39", name: "Gelato", price: 65, productGroup: "Mat", articleNr: "", created: "2025-02-20" }
+    ]}
+  ]
+};
+
+// ─── APP STATE ──────────────────────────────────────────────
+const state = {
+  scope: 'company',          // 'company' | 'costcenter' | 'register'
+  selectedCC: 'cc1',
+  selectedCR: 'pos1',
+  useDefault: {},            // { cc1: true, pos1: true, ... }
+  screenMode: 'wide',       // 'wide' | 'mobile'
+  selectedCategoryId: 'cat3',
+  expandedCategories: { cat2: true, cat6: true },
+  previewCategory: 'cat3',  // which category tab is active in preview
+  wideColumns: 4,
+  wideRowHeight: 5,
+  mobileColumns: 2,
+  mobileRowHeight: 4,
+  selectArticlesOpen: false,
+  selectArticlesSort: { field: 'name', dir: 'asc' },
+  selectArticlesSearch: '',
+  selectArticlesSelection: new Set(),
+};
+
+// Initialize useDefault for all CCs and registers
+mockData.costCenters.forEach(cc => {
+  state.useDefault[cc.id] = true;
+  cc.registers.forEach(r => { state.useDefault[r.id] = true; });
+});
+
+// ─── HELPERS ────────────────────────────────────────────────
+function icon(name, extra = '') {
+  return `<span class="material-symbols-outlined ${extra}">${name}</span>`;
+}
+
+function findCategory(id, cats = mockData.categories) {
+  for (const c of cats) {
+    if (c.id === id) return c;
+    if (c.children) {
+      const found = findCategory(id, c.children);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function getAllArticleIds(cats = mockData.categories) {
+  const ids = new Set();
+  for (const c of cats) {
+    (c.articles || []).forEach(a => ids.add(a.id));
+    if (c.children) {
+      for (const sc of c.children) {
+        (sc.articles || []).forEach(a => ids.add(a.id));
+      }
+    }
+  }
+  return ids;
+}
+
+function allArticles() {
+  const list = [];
+  function walk(cats) {
+    for (const c of cats) {
+      (c.articles || []).forEach(a => list.push({ ...a, catId: c.id, catName: c.name }));
+      if (c.children) walk(c.children);
+    }
+  }
+  walk(mockData.categories);
+  return list;
+}
+
+function getAssignedIds() {
+  return getAllArticleIds(mockData.categories);
+}
+
+function formatPrice(p) {
+  return p.toFixed(2).replace('.', ',');
+}
+
+function getParentCategory(catId) {
+  for (const c of mockData.categories) {
+    if (c.id === catId) return c;
+    if (c.children && c.children.some(ch => ch.id === catId)) return c;
+  }
+  return null;
+}
+
+function getAllArticlesFlat() {
+  const list = [];
+  function walk(cats) {
+    for (const c of cats) {
+      (c.articles || []).forEach(a => list.push({ ...a, catId: c.id, catName: c.name, catColor: c.color }));
+      if (c.children) walk(c.children);
+    }
+  }
+  walk(mockData.categories);
+  // Add unassigned articles
+  (mockData.unassignedArticles || []).forEach(a => list.push({ ...a, catId: null, catName: 'Unassigned', catColor: '#9ca3af' }));
+  return list;
+}
+
+function openSelectArticles() {
+  const cat = findCategory(state.selectedCategoryId);
+  if (!cat) return;
+  const articles = cat.articles || [];
+  state.selectArticlesSelection = new Set(articles.map(a => a.id));
+  state.selectArticlesSearch = '';
+  state.selectArticlesSort = { field: 'name', dir: 'asc' };
+  state.selectArticlesOpen = true;
+  render();
+  // Focus search
+  const el = document.getElementById('selectArticlesSearchInput');
+  if (el) el.focus();
+}
+
+function closeSelectArticles() {
+  state.selectArticlesOpen = false;
+  render();
+}
+
+function confirmSelectArticles() {
+  const cat = findCategory(state.selectedCategoryId);
+  if (!cat) return;
+  const allFlat = getAllArticlesFlat();
+  const selectedIds = state.selectArticlesSelection;
+
+  // Build new articles array for this category from selection
+  const newArticles = [];
+  for (const a of allFlat) {
+    if (selectedIds.has(a.id)) {
+      newArticles.push({ id: a.id, name: a.name, price: a.price, productGroup: a.productGroup, articleNr: a.articleNr, created: a.created });
+    }
+  }
+
+  // Remove selected articles from their original locations (other categories + unassigned)
+  const selectedSet = new Set(newArticles.map(a => a.id));
+  function removeFromCats(cats) {
+    for (const c of cats) {
+      if (c.id !== cat.id && c.articles) {
+        c.articles = c.articles.filter(a => !selectedSet.has(a.id));
+      }
+      if (c.children) removeFromCats(c.children);
+    }
+  }
+  removeFromCats(mockData.categories);
+  mockData.unassignedArticles = (mockData.unassignedArticles || []).filter(a => !selectedSet.has(a.id));
+
+  // Articles that were in this category but are no longer selected go to unassigned
+  const oldArticles = cat.articles || [];
+  for (const a of oldArticles) {
+    if (!selectedSet.has(a.id)) {
+      mockData.unassignedArticles.push({ id: a.id, name: a.name, price: a.price, productGroup: a.productGroup, articleNr: a.articleNr, created: a.created });
+    }
+  }
+
+  cat.articles = newArticles;
+  state.selectArticlesOpen = false;
+  render();
+}
+
+function toggleArticleSelection(id) {
+  if (state.selectArticlesSelection.has(id)) {
+    state.selectArticlesSelection.delete(id);
+  } else {
+    state.selectArticlesSelection.add(id);
+  }
+  renderSelectArticlesOverlay();
+}
+
+function sortSelectArticles(field) {
+  if (state.selectArticlesSort.field === field) {
+    state.selectArticlesSort.dir = state.selectArticlesSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    state.selectArticlesSort.field = field;
+    state.selectArticlesSort.dir = field === 'created' ? 'desc' : 'asc';
+  }
+  renderSelectArticlesOverlay();
+}
+
+function toggleSelectAll() {
+  const allFlat = getAllArticlesFlat();
+  const search = state.selectArticlesSearch.toLowerCase();
+  const filtered = search ? allFlat.filter(a => a.name.toLowerCase().includes(search)) : allFlat;
+  const allSelected = filtered.every(a => state.selectArticlesSelection.has(a.id));
+  if (allSelected) {
+    filtered.forEach(a => state.selectArticlesSelection.delete(a.id));
+  } else {
+    filtered.forEach(a => state.selectArticlesSelection.add(a.id));
+  }
+  renderSelectArticlesOverlay();
+}
+
+// Get the active preview category, resolving parent->first child if needed
+function getEffectivePreviewCategory() {
+  const cat = findCategory(state.previewCategory);
+  if (!cat) return null;
+  // If it's a parent with children, return first child
+  if (cat.children && cat.children.length > 0) {
+    return cat.children[0];
+  }
+  return cat;
+}
+
+// Flatten visible categories for the preview tabs
+function getVisibleCategories() {
+  const list = [];
+  for (const c of mockData.categories) {
+    if (c.children && c.children.length > 0) {
+      for (const sc of c.children) list.push(sc);
+    } else {
+      list.push(c);
+    }
+  }
+  return list;
+}
+
+// ─── SIDEBAR NAV ────────────────────────────────────────────
+const navItems = [
+  { icon: 'dashboard', label: 'Dashboard' },
+  { icon: 'inventory_2', label: 'Articles' },
+  { icon: 'bolt', label: 'Actions' },
+  { icon: 'receipt_long', label: 'Receipts' },
+  { icon: 'card_giftcard', label: 'Vouchers' },
+  { icon: 'local_shipping', label: 'Delivery info' },
+  { icon: 'grid_view', label: 'Layout', active: true },
+  { icon: 'upload', label: 'Export' },
+  { icon: 'bar_chart', label: 'Reports' },
+  { icon: 'business', label: 'Company' },
+  { icon: 'settings', label: 'Settings' },
+  { icon: 'print', label: 'Printer' },
+  { icon: 'shopping_cart', label: 'Online orders' },
+  { icon: 'point_of_sale', label: 'Sales mgmt' },
+  { icon: 'warehouse', label: 'Storage' },
+  { icon: 'help', label: 'Help' },
+];
+
+// ─── RENDER ─────────────────────────────────────────────────
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    ${renderSidebar()}
+    <div class="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+      ${renderToolbar()}
+      ${renderInheritanceBar()}
+      <div class="flex flex-1 min-h-0 overflow-hidden">
+        ${renderCategoryTree()}
+        ${renderPreview()}
+        ${renderSettingsPanel()}
+      </div>
+    </div>
+    ${state.selectArticlesOpen ? renderSelectArticlesModal() : ''}
+  `;
+  bindEvents();
+}
+
+function renderSelectArticlesModal() {
+  const cat = findCategory(state.selectedCategoryId);
+  const catName = cat ? cat.name : '';
+  return `
+  <div id="selectArticlesOverlay" class="fixed inset-0 z-50 flex justify-end" style="background:rgba(0,0,0,0.35)">
+    <div class="bg-white shadow-2xl flex flex-col h-full" style="width:min(860px, 70vw);">
+      <!-- Header -->
+      <div class="px-6 pt-5 pb-3 border-b border-gray-200">
+        <div class="flex items-center justify-between mb-1">
+          <h2 class="text-lg font-bold text-gray-900">Select articles</h2>
+          <button onclick="closeSelectArticles()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+            ${icon('close', 'icon-sm')}
+          </button>
+        </div>
+        <p class="text-sm text-gray-500">${catName}</p>
+        <!-- Search -->
+        <div class="relative mt-3">
+          <span class="material-symbols-outlined icon-sm absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+          <input id="selectArticlesSearchInput" type="text" placeholder="Search" value="${state.selectArticlesSearch}"
+            class="w-full border border-gray-300 rounded-lg pl-10 pr-9 py-2 text-sm bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30" />
+          ${state.selectArticlesSearch ? `
+          <button onclick="state.selectArticlesSearch='';renderSelectArticlesOverlay();document.getElementById('selectArticlesSearchInput').focus();"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            ${icon('close', 'icon-xs')}
+          </button>` : ''}
+        </div>
+        <!-- Select all -->
+        <div class="mt-2">
+          <button onclick="toggleSelectAll()" class="text-xs font-semibold text-primary hover:opacity-80 transition-colors" id="selectAllBtn">
+          </button>
+        </div>
+      </div>
+      <!-- Table body -->
+      <div id="selectArticlesTableBody" class="flex-1 overflow-y-auto px-6">
+      </div>
+      <!-- Footer -->
+      <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3">
+        <button onclick="closeSelectArticles()" class="px-5 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+        <button onclick="confirmSelectArticles()" class="px-5 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-colors" style="background:#624fa6">Confirm</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSelectArticlesOverlay() {
+  const allFlat = getAllArticlesFlat();
+  const search = state.selectArticlesSearch.toLowerCase();
+  let filtered = search ? allFlat.filter(a => a.name.toLowerCase().includes(search)) : [...allFlat];
+
+  // Sort
+  const { field, dir } = state.selectArticlesSort;
+  filtered.sort((a, b) => {
+    let va, vb;
+    if (field === 'name') { va = a.name.toLowerCase(); vb = b.name.toLowerCase(); }
+    else if (field === 'productGroup') { va = (a.productGroup || '').toLowerCase(); vb = (b.productGroup || '').toLowerCase(); }
+    else if (field === 'articleNr') { va = a.articleNr || ''; vb = b.articleNr || ''; }
+    else if (field === 'price') { va = a.price; vb = b.price; }
+    else if (field === 'created') { va = a.created || ''; vb = b.created || ''; }
+    else { va = a.name.toLowerCase(); vb = b.name.toLowerCase(); }
+    if (va < vb) return dir === 'asc' ? -1 : 1;
+    if (va > vb) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const allSelected = filtered.length > 0 && filtered.every(a => state.selectArticlesSelection.has(a.id));
+  const selectAllBtn = document.getElementById('selectAllBtn');
+  if (selectAllBtn) selectAllBtn.textContent = allSelected ? 'Deselect all' : 'Select all';
+
+  function sortIcon(f) {
+    if (state.selectArticlesSort.field !== f) return '';
+    return `<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-left:2px;">${state.selectArticlesSort.dir === 'asc' ? 'arrow_upward' : 'arrow_downward'}</span>`;
+  }
+
+  const tableBody = document.getElementById('selectArticlesTableBody');
+  if (!tableBody) return;
+  tableBody.innerHTML = `
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-gray-200 text-left">
+          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap" onclick="sortSelectArticles('name')" style="width:30%">Name${sortIcon('name')}</th>
+          <th class="py-2 pr-2 font-medium text-gray-500 text-xs whitespace-nowrap" style="width:10%">Category</th>
+          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap" onclick="sortSelectArticles('productGroup')" style="width:16%">Product group${sortIcon('productGroup')}</th>
+          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap" onclick="sortSelectArticles('articleNr')" style="width:12%">Art.Nr${sortIcon('articleNr')}</th>
+          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap text-right" onclick="sortSelectArticles('price')" style="width:14%">Price${sortIcon('price')}</th>
+          <th class="py-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap text-right" onclick="sortSelectArticles('created')" style="width:18%">Created${sortIcon('created')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filtered.map(a => {
+          const isSelected = state.selectArticlesSelection.has(a.id);
+          return `
+          <tr class="border-b border-gray-100 cursor-pointer transition-colors hover:bg-gray-50 select-article-row"
+            style="${isSelected ? 'background:rgba(98,79,166,0.1)' : ''}"
+            data-article-id="${a.id}">
+            <td class="py-2 pr-2 truncate text-gray-800" style="max-width:0">${a.name}</td>
+            <td class="py-2 pr-2"><span class="inline-block w-3 h-3 rounded-sm" style="background:${a.catColor}" title="${a.catName}"></span></td>
+            <td class="py-2 pr-2 text-gray-600 truncate" style="max-width:0">${a.productGroup || ''}</td>
+            <td class="py-2 pr-2 text-gray-600">${a.articleNr || ''}</td>
+            <td class="py-2 pr-2 text-gray-800 text-right whitespace-nowrap">${formatPrice(a.price)}</td>
+            <td class="py-2 text-gray-600 text-right whitespace-nowrap">${a.created || ''}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+
+  // Bind row clicks
+  tableBody.querySelectorAll('.select-article-row').forEach(row => {
+    row.addEventListener('click', () => {
+      toggleArticleSelection(row.dataset.articleId);
+    });
+  });
+
+  // Bind search
+  const searchInput = document.getElementById('selectArticlesSearchInput');
+  if (searchInput) {
+    searchInput.removeEventListener('input', handleSelectArticlesSearch);
+    searchInput.addEventListener('input', handleSelectArticlesSearch);
+  }
+}
+
+function handleSelectArticlesSearch() {
+  state.selectArticlesSearch = this.value;
+  renderSelectArticlesOverlay();
+}
+
+// ─── SIDEBAR ────────────────────────────────────────────────
+function renderSidebar() {
+  return `
+  <aside class="w-56 bg-white border-l-4 border-l-primary border-r border-r-gray-200 flex flex-col h-full shrink-0">
+    <div class="h-14 flex items-center px-5 border-b border-gray-200">
+      <span class="text-lg font-bold text-gray-900">OPENPOS</span>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-2 px-2">
+      ${navItems.map(n => {
+        const active = n.active;
+        return `
+        <button class="nav-item w-full flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors rounded-lg mb-0.5
+          ${active ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100'}">
+          ${icon(n.icon, 'icon-sm')}
+          <span>${n.label}</span>
+        </button>`;
+      }).join('')}
+    </nav>
+  </aside>`;
+}
+
+// ─── TOOLBAR ────────────────────────────────────────────────
+function renderToolbar() {
+  const scopes = [
+    { key: 'company', label: 'Company' },
+    { key: 'costcenter', label: 'Cost Center' },
+    { key: 'register', label: 'Cash Register' },
+  ];
+
+  let scopeDropdown = '';
+  if (state.scope === 'costcenter') {
+    scopeDropdown = `
+    <select id="scopeDropdown" class="ml-3 text-sm border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900 focus:outline-none focus:border-primary">
+      ${mockData.costCenters.map(cc => `<option value="${cc.id}" ${state.selectedCC === cc.id ? 'selected' : ''}>${cc.name}</option>`).join('')}
+    </select>`;
+  } else if (state.scope === 'register') {
+    const allRegisters = mockData.costCenters.flatMap(cc => cc.registers.map(r => ({ ...r, ccName: cc.name })));
+    scopeDropdown = `
+    <select id="scopeDropdown" class="ml-3 text-sm border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900 focus:outline-none focus:border-primary">
+      ${allRegisters.map(r => `<option value="${r.id}" ${state.selectedCR === r.id ? 'selected' : ''}>${r.ccName} — ${r.name}</option>`).join('')}
+    </select>`;
+  }
+
+  return `
+  <header class="h-14 border-b border-gray-200 flex items-center px-5 shrink-0 bg-white">
+    <span class="text-2xl font-bold text-gray-900 mr-auto whitespace-nowrap">Cash register layout</span>
+    <div class="flex items-center gap-0 mx-auto">
+      <div class="flex rounded-lg border border-gray-200 overflow-hidden">
+        ${scopes.map(s => `
+          <button data-scope="${s.key}" class="scope-btn px-4 py-1.5 text-sm font-medium transition-colors
+            ${state.scope === s.key ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}">
+            ${s.label}
+          </button>`).join('')}
+      </div>
+      ${scopeDropdown}
+    </div>
+    <div class="flex items-center gap-1 ml-auto border border-gray-200 rounded-full p-0.5">
+      <button data-screen="wide" class="screen-btn px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 transition-colors ${state.screenMode === 'wide' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}">
+        ${icon('tablet_mac', 'icon-sm')}
+        <span>Wide</span>
+      </button>
+      <button data-screen="mobile" class="screen-btn px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 transition-colors ${state.screenMode === 'mobile' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}">
+        ${icon('smartphone', 'icon-sm')}
+        <span>Mobile</span>
+      </button>
+    </div>
+  </header>`;
+}
+
+// ─── INHERITANCE BAR ────────────────────────────────────────
+function renderInheritanceBar() {
+  if (state.scope === 'company') return '';
+  const scopeId = state.scope === 'costcenter' ? state.selectedCC : state.selectedCR;
+  const isDefault = state.useDefault[scopeId] !== false;
+
+  if (isDefault) {
+    return `
+    <div class="h-10 flex items-center px-5 text-sm bg-purple-50 text-purple-800 border-b border-purple-200 shrink-0">
+      ${icon('info', 'icon-xs mr-1')}
+      <span>Inheriting layout from Company.</span>
+      <button id="customizeBtn" class="ml-3 px-3 py-0.5 text-xs font-semibold bg-primary text-white rounded-md hover:opacity-90 transition-colors">Customize</button>
+    </div>`;
+  } else {
+    return `
+    <div class="h-10 flex items-center px-5 text-sm bg-green-50 text-green-800 border-b border-green-200 shrink-0">
+      ${icon('check_circle', 'icon-xs mr-1')}
+      <span>Custom layout — overrides Company defaults.</span>
+      <button id="resetBtn" class="ml-3 text-xs font-semibold underline text-green-700 hover:text-green-900 transition-colors">Reset to inherited</button>
+    </div>`;
+  }
+}
+
+// ─── CATEGORY TREE ──────────────────────────────────────────
+function renderCategoryTree() {
+  function renderRow(cat, indent = false, parentId = null) {
+    const isSelected = state.selectedCategoryId === cat.id;
+    const hasChildren = cat.children && cat.children.length > 0;
+    const isExpanded = state.expandedCategories[cat.id];
+    const isActive = cat.active;
+    const catType = indent ? 'sub' : 'parent';
+
+    let childrenHtml = '';
+    if (hasChildren && isExpanded) {
+      childrenHtml = cat.children.map(sc => renderRow(sc, true, cat.id)).join('');
+    }
+
+    return `
+    <div>
+      <div class="cat-row group flex items-center h-11 cursor-pointer transition-colors relative rounded-lg mx-2 my-0.5
+        ${isSelected ? 'bg-white border border-dashed border-gray-400 shadow-sm' : 'hover:bg-gray-50'}
+        ${indent ? 'ml-8' : ''}
+        ${!isActive ? 'opacity-50' : ''}"
+        draggable="true"
+        data-cat-id="${cat.id}"
+        data-cat-type="${catType}"
+        ${parentId ? `data-parent-id="${parentId}"` : ''}>
+        <div class="w-1 shrink-0 self-stretch rounded-l-lg" style="background:${cat.color}"></div>
+        <span class="material-symbols-outlined icon-xs text-gray-400 mx-1 drag-handle">drag_indicator</span>
+        ${hasChildren ? `
+          <button class="chevron-btn flex items-center justify-center w-5 h-5 shrink-0" data-toggle-id="${cat.id}">
+            <span class="material-symbols-outlined icon-xs text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}">${'chevron_right'}</span>
+          </button>
+        ` : '<span class="w-5 shrink-0"></span>'}
+        <span class="flex-1 text-sm font-medium truncate mx-1 text-gray-800 ${!isActive ? 'line-through' : ''}">${cat.name}</span>
+        <button class="toggle-active-btn shrink-0 w-9 h-5 mx-2 relative rounded-full transition-colors ${isActive ? 'bg-primary' : 'bg-gray-300'}"
+          data-active-id="${cat.id}">
+          <span class="absolute top-0.5 ${isActive ? 'right-0.5' : 'left-0.5'} w-4 h-4 bg-white rounded-full shadow transition-all"></span>
+        </button>
+      </div>
+      ${childrenHtml}
+    </div>`;
+  }
+
+  return `
+  <div class="w-72 border-r border-gray-200 flex flex-col h-full shrink-0 bg-white">
+    <div class="flex items-center justify-between px-4 h-11 border-b border-gray-200 shrink-0">
+      <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Categories</span>
+      <button onclick="alert('Add category — coming soon')" class="w-7 h-7 flex items-center justify-center rounded-md text-primary hover:bg-gray-100 transition-colors">
+        ${icon('add', 'icon-sm')}
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto py-1">
+      ${mockData.categories.map(c => renderRow(c)).join('')}
+    </div>
+  </div>`;
+}
+
+// Convert row height level (1-10) to pixels
+function rowHeightToPx(level) {
+  return 28 + (level - 1) * 8; // 28px at level 1, 100px at level 10
+}
+
+// ─── LAYOUT PREVIEW ─────────────────────────────────────────
+function renderArticleGrid(articles, cols, rowH, colorFallback) {
+  const totalSlots = Math.max(cols * 3, articles.length);
+  const slots = [];
+  for (let i = 0; i < totalSlots; i++) {
+    slots.push(articles[i] || null);
+  }
+  return `
+    <div class="grid gap-2" style="grid-template-columns:repeat(${cols},1fr)">
+      ${slots.map(s => {
+        if (s) {
+          return `
+          <div class="rounded-lg flex flex-col items-center justify-center text-center p-1.5 transition-colors hover:opacity-90"
+            style="height:${rowH}px; background:${colorFallback}">
+            <span class="text-xs font-medium leading-tight line-clamp-2 text-white">${s.name}</span>
+            <span class="text-[11px] text-white/80 mt-0.5">${formatPrice(s.price)}</span>
+          </div>`;
+        } else {
+          return `
+          <div class="border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 hover:border-primary hover:text-primary transition-colors cursor-pointer"
+            style="height:${rowH}px">
+            ${icon('add', 'icon-sm')}
+          </div>`;
+        }
+      }).join('')}
+    </div>`;
+}
+
+function renderPreview() {
+  const isWide = state.screenMode === 'wide';
+  const cols = isWide ? state.wideColumns : state.mobileColumns;
+  const rowH = rowHeightToPx(isWide ? state.wideRowHeight : state.mobileRowHeight);
+
+  if (isWide) {
+    return renderWidePreview(cols, rowH);
+  } else {
+    return renderMobilePreview(cols, rowH);
+  }
+}
+
+function renderWidePreview(cols, rowH) {
+  const parents = mockData.categories;
+  // Determine active parent
+  let activeParentId = state.previewCategory;
+  const directParent = getParentCategory(state.previewCategory);
+  if (directParent) {
+    // If previewCategory is a subcategory, highlight its parent
+    const isTopLevel = parents.some(p => p.id === state.previewCategory);
+    if (!isTopLevel) {
+      activeParentId = directParent.id;
+    }
+  }
+
+  const activeParent = findCategory(activeParentId);
+  const hasChildren = activeParent && activeParent.children && activeParent.children.length > 0;
+
+  // Determine which articles to show
+  let displayCat;
+  if (hasChildren) {
+    // Show subcategory pills; find active subcategory
+    let activeSubId = state.previewCategory;
+    const isSubOfParent = activeParent.children.some(ch => ch.id === state.previewCategory);
+    if (!isSubOfParent) {
+      activeSubId = activeParent.children[0].id;
+    }
+    displayCat = findCategory(activeSubId);
+  } else {
+    displayCat = activeParent;
+  }
+
+  const articles = displayCat ? (displayCat.articles || []) : [];
+  const catColor = displayCat ? displayCat.color : '#9ca3af';
+
+  // Subcategory pills
+  let subcatPills = '';
+  if (hasChildren) {
+    const activeSubId = displayCat ? displayCat.id : '';
+    subcatPills = `
+      <div class="flex overflow-x-auto gap-1.5 mb-2">
+        ${activeParent.children.map(sc => {
+          const isActive = activeSubId === sc.id;
+          return `
+          <button class="preview-tab shrink-0 px-3 py-1 text-[11px] font-medium whitespace-nowrap rounded-full transition-colors
+            ${isActive ? 'text-white' : 'bg-white text-gray-600 hover:bg-gray-200 border border-gray-200'}
+            ${!sc.active ? 'opacity-40' : ''}"
+            style="${isActive ? `background:${sc.color}` : ''}"
+            data-preview-cat="${sc.id}">
+            ${sc.name}
+          </button>`;
+        }).join('')}
+      </div>`;
+  }
+
+  return `
+  <div class="flex-1 flex items-center justify-center bg-gray-100 overflow-auto p-6">
+    <div class="transition-all duration-300 max-w-2xl w-full">
+      <div class="bg-gray-50 rounded-2xl shadow-sm p-4" style="min-height:410px">
+        <!-- Notch indicator -->
+        <div class="flex justify-center mb-3">
+          <div class="w-16 h-1.5 bg-gray-300 rounded-full"></div>
+        </div>
+        <!-- Tablet layout: sidebar + grid -->
+        <div class="flex gap-0 h-full">
+          <!-- Left sidebar: parent categories -->
+          <div class="w-16 shrink-0 flex flex-col gap-1 pr-2 border-r border-gray-200 overflow-y-auto" style="max-height:360px">
+            ${parents.map(p => {
+              const isActive = activeParentId === p.id;
+              return `
+              <button class="preview-parent-tab flex flex-col items-center gap-0.5 px-1 py-2 rounded-lg transition-colors text-center
+                ${isActive ? 'bg-gray-200' : 'hover:bg-gray-100'}"
+                data-preview-parent="${p.id}">
+                <span class="w-3 h-3 rounded-full shrink-0" style="background:${p.color}"></span>
+                <span class="text-[9px] font-medium leading-tight ${isActive ? 'text-gray-900' : 'text-gray-500'} ${!p.active ? 'opacity-40 line-through' : ''}">${p.name}</span>
+              </button>`;
+            }).join('')}
+          </div>
+          <!-- Right area: subcategory pills + article grid -->
+          <div class="flex-1 pl-2">
+            ${subcatPills}
+            ${renderArticleGrid(articles, cols, rowH, catColor)}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMobilePreview(cols, rowH) {
+  const parents = mockData.categories;
+  // Determine active parent
+  let activeParentId = state.previewCategory;
+  const directParent = getParentCategory(state.previewCategory);
+  if (directParent) {
+    const isTopLevel = parents.some(p => p.id === state.previewCategory);
+    if (!isTopLevel) {
+      activeParentId = directParent.id;
+    }
+  }
+
+  const activeParent = findCategory(activeParentId);
+  const hasChildren = activeParent && activeParent.children && activeParent.children.length > 0;
+
+  // Determine which articles to show
+  let displayCat;
+  if (hasChildren) {
+    let activeSubId = state.previewCategory;
+    const isSubOfParent = activeParent.children.some(ch => ch.id === state.previewCategory);
+    if (!isSubOfParent) {
+      activeSubId = activeParent.children[0].id;
+    }
+    displayCat = findCategory(activeSubId);
+  } else {
+    displayCat = activeParent;
+  }
+
+  const articles = displayCat ? (displayCat.articles || []) : [];
+  const catColor = displayCat ? displayCat.color : '#9ca3af';
+
+  // Parent tabs
+  const parentTabs = `
+    <div class="flex overflow-x-auto mb-2 gap-1.5">
+      ${parents.map(p => {
+        const isActive = activeParentId === p.id;
+        return `
+        <button class="preview-parent-tab shrink-0 px-3 py-1.5 text-xs font-medium whitespace-nowrap rounded-full transition-colors
+          ${isActive ? 'text-white' : 'bg-white text-gray-600 hover:bg-gray-200 border border-gray-200'}
+          ${!p.active ? 'opacity-40' : ''}"
+          style="${isActive ? `background:${p.color}` : ''}"
+          data-preview-parent="${p.id}">
+          ${p.name}
+        </button>`;
+      }).join('')}
+    </div>`;
+
+  // Subcategory pills
+  let subcatPills = '';
+  if (hasChildren) {
+    const activeSubId = displayCat ? displayCat.id : '';
+    subcatPills = `
+      <div class="flex overflow-x-auto gap-1 mb-2">
+        ${activeParent.children.map(sc => {
+          const isActive = activeSubId === sc.id;
+          return `
+          <button class="preview-tab shrink-0 px-2.5 py-1 text-[11px] font-medium whitespace-nowrap rounded-full transition-colors
+            ${isActive ? 'text-white' : 'bg-white text-gray-500 hover:bg-gray-200 border border-gray-200'}
+            ${!sc.active ? 'opacity-40' : ''}"
+            style="${isActive ? `background:${sc.color}` : ''}"
+            data-preview-cat="${sc.id}">
+            ${sc.name}
+          </button>`;
+        }).join('')}
+      </div>`;
+  }
+
+  return `
+  <div class="flex-1 flex items-center justify-center bg-gray-100 overflow-auto p-6">
+    <div class="transition-all duration-300 max-w-xs w-full">
+      <div class="bg-gray-50 rounded-2xl shadow-sm p-4" style="min-height:540px">
+        <!-- Notch indicator -->
+        <div class="flex justify-center mb-3">
+          <div class="w-16 h-1.5 bg-gray-300 rounded-full"></div>
+        </div>
+        <!-- Parent category tabs -->
+        ${parentTabs}
+        <!-- Subcategory pills -->
+        ${subcatPills}
+        <!-- Article grid -->
+        ${renderArticleGrid(articles, cols, rowH, catColor)}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── SETTINGS PANEL ─────────────────────────────────────────
+function renderSettingsPanel() {
+  const cat = findCategory(state.selectedCategoryId);
+  if (!cat) {
+    return `
+    <div class="w-80 border-l border-gray-200 bg-white flex items-center justify-center text-sm text-gray-500 shrink-0">
+      Select a category
+    </div>`;
+  }
+
+  const presetColors = ['#e67e22','#27ae60','#d4780a','#f1c40f','#3498db','#9b59b6','#795548','#c0392b'];
+  const articles = cat.articles || [];
+
+  return `
+  <div class="w-80 border-l border-gray-200 bg-white flex flex-col h-full shrink-0 overflow-y-auto">
+    <div class="p-4 space-y-5">
+
+      <!-- Category settings -->
+      <div>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Category</h3>
+        <label class="block text-sm text-gray-500 mb-1">Name</label>
+        <input id="catNameInput" type="text" value="${cat.name}" class="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30" />
+
+        <label class="block text-sm text-gray-500 mt-3 mb-1">Color</label>
+        <div class="grid grid-cols-8 gap-2">
+          ${presetColors.map(c => `
+            <button class="color-swatch w-7 h-7 rounded-full border-2 transition-all ${cat.color === c ? 'border-gray-900 scale-110 ring-2 ring-gray-300' : 'border-transparent hover:scale-105'}"
+              style="background:${c}" data-color="${c}"></button>
+          `).join('')}
+        </div>
+
+        <div class="flex items-center justify-between mt-3">
+          <span class="text-sm text-gray-500">Active</span>
+          <button id="catActiveToggle" class="w-10 h-5 relative rounded-full transition-colors ${cat.active ? 'bg-primary' : 'bg-gray-300'}">
+            <span class="absolute top-0.5 ${cat.active ? 'right-0.5' : 'left-0.5'} w-4 h-4 bg-white rounded-full shadow transition-all"></span>
+          </button>
+        </div>
+      </div>
+
+      <hr class="border-gray-200">
+
+      <!-- Wide screen config -->
+      <div>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Wide Screen Config</h3>
+        <p class="text-[10px] text-gray-400 italic mb-2">Applied to all categories</p>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-gray-500">Columns</span>
+          <span class="text-sm font-semibold text-gray-900" id="wideColVal">${state.wideColumns}</span>
+        </div>
+        <input type="range" id="wideColSlider" min="1" max="10" value="${state.wideColumns}" class="w-full mb-3" />
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-gray-500">Row height</span>
+          <span class="text-sm font-semibold text-gray-900" id="wideRowVal">${state.wideRowHeight}</span>
+        </div>
+        <input type="range" id="wideRowSlider" min="1" max="10" value="${state.wideRowHeight}" class="w-full" />
+      </div>
+
+      <hr class="border-gray-200">
+
+      <!-- Mobile screen config -->
+      <div>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Mobile Screen Config</h3>
+        <p class="text-[10px] text-gray-400 italic mb-2">Applied to all categories</p>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-gray-500">Columns</span>
+          <span class="text-sm font-semibold text-gray-900" id="mobileColVal">${state.mobileColumns}</span>
+        </div>
+        <input type="range" id="mobileColSlider" min="1" max="10" value="${state.mobileColumns}" class="w-full mb-3" />
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-gray-500">Row height</span>
+          <span class="text-sm font-semibold text-gray-900" id="mobileRowVal">${state.mobileRowHeight}</span>
+        </div>
+        <input type="range" id="mobileRowSlider" min="1" max="10" value="${state.mobileRowHeight}" class="w-full" />
+      </div>
+
+      <hr class="border-gray-200">
+
+      <!-- Articles -->
+      <div>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Articles</h3>
+        <p class="text-sm text-gray-600 mb-2">${articles.length} articles assigned</p>
+        <button id="openSelectArticles" class="w-full py-2 px-4 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined" style="font-size:18px;">edit_note</span>
+          Select articles
+        </button>
+      </div>
+
+    </div>
+  </div>`;
+}
+
+// ─── EVENTS ─────────────────────────────────────────────────
+function bindEvents() {
+  // Scope buttons
+  document.querySelectorAll('.scope-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.scope = btn.dataset.scope;
+      render();
+    });
+  });
+
+  // Scope dropdown
+  const dd = document.getElementById('scopeDropdown');
+  if (dd) {
+    dd.addEventListener('change', () => {
+      if (state.scope === 'costcenter') state.selectedCC = dd.value;
+      else state.selectedCR = dd.value;
+      render();
+    });
+  }
+
+  // Customize / Reset
+  const customizeBtn = document.getElementById('customizeBtn');
+  if (customizeBtn) {
+    customizeBtn.addEventListener('click', () => {
+      const id = state.scope === 'costcenter' ? state.selectedCC : state.selectedCR;
+      state.useDefault[id] = false;
+      render();
+    });
+  }
+  const resetBtn = document.getElementById('resetBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      const id = state.scope === 'costcenter' ? state.selectedCC : state.selectedCR;
+      state.useDefault[id] = true;
+      render();
+    });
+  }
+
+  // Screen toggle
+  document.querySelectorAll('.screen-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.screenMode = btn.dataset.screen;
+      render();
+    });
+  });
+
+  // Category row click (select)
+  document.querySelectorAll('.cat-row').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.chevron-btn') || e.target.closest('.toggle-active-btn') || e.target.closest('.drag-handle')) return;
+      const catId = row.dataset.catId;
+      state.selectedCategoryId = catId;
+      // For preview: if it's a parent with children, select first child; otherwise select directly
+      const clickedCat = findCategory(catId);
+      if (clickedCat && clickedCat.children && clickedCat.children.length > 0) {
+        state.previewCategory = clickedCat.children[0].id;
+      } else {
+        state.previewCategory = catId;
+      }
+      render();
+    });
+  });
+
+  // Chevron toggle
+  document.querySelectorAll('.chevron-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.toggleId;
+      state.expandedCategories[id] = !state.expandedCategories[id];
+      render();
+    });
+  });
+
+  // Active toggle in tree
+  document.querySelectorAll('.toggle-active-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const cat = findCategory(btn.dataset.activeId);
+      if (cat) {
+        cat.active = !cat.active;
+        render();
+      }
+    });
+  });
+
+  // Preview parent category tabs/sidebar buttons
+  document.querySelectorAll('.preview-parent-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const parentId = tab.dataset.previewParent;
+      const parent = findCategory(parentId);
+      if (parent && parent.children && parent.children.length > 0) {
+        // Has subcategories — select first child
+        state.previewCategory = parent.children[0].id;
+        state.selectedCategoryId = parent.children[0].id;
+      } else {
+        state.previewCategory = parentId;
+        state.selectedCategoryId = parentId;
+      }
+      render();
+    });
+  });
+
+  // Preview subcategory tabs
+  document.querySelectorAll('.preview-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      state.previewCategory = tab.dataset.previewCat;
+      state.selectedCategoryId = tab.dataset.previewCat;
+      render();
+    });
+  });
+
+  // Settings: category name
+  const nameInput = document.getElementById('catNameInput');
+  if (nameInput) {
+    nameInput.addEventListener('input', () => {
+      const cat = findCategory(state.selectedCategoryId);
+      if (cat) { cat.name = nameInput.value; render(); }
+    });
+  }
+
+  // Settings: color swatches
+  document.querySelectorAll('.color-swatch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      const cat = findCategory(state.selectedCategoryId);
+      if (cat) { cat.color = sw.dataset.color; render(); }
+    });
+  });
+
+  // Settings: active toggle
+  const catActive = document.getElementById('catActiveToggle');
+  if (catActive) {
+    catActive.addEventListener('click', () => {
+      const cat = findCategory(state.selectedCategoryId);
+      if (cat) { cat.active = !cat.active; render(); }
+    });
+  }
+
+  // Wide sliders
+  const wcs = document.getElementById('wideColSlider');
+  if (wcs) {
+    wcs.addEventListener('input', () => {
+      state.wideColumns = parseInt(wcs.value);
+      document.getElementById('wideColVal').textContent = wcs.value;
+      renderPreviewOnly();
+    });
+  }
+  const wrs = document.getElementById('wideRowSlider');
+  if (wrs) {
+    wrs.addEventListener('input', () => {
+      state.wideRowHeight = parseInt(wrs.value);
+      document.getElementById('wideRowVal').textContent = wrs.value;
+      renderPreviewOnly();
+    });
+  }
+
+  // Mobile sliders
+  const mcs = document.getElementById('mobileColSlider');
+  if (mcs) {
+    mcs.addEventListener('input', () => {
+      state.mobileColumns = parseInt(mcs.value);
+      document.getElementById('mobileColVal').textContent = mcs.value;
+      renderPreviewOnly();
+    });
+  }
+  const mrs = document.getElementById('mobileRowSlider');
+  if (mrs) {
+    mrs.addEventListener('input', () => {
+      state.mobileRowHeight = parseInt(mrs.value);
+      document.getElementById('mobileRowVal').textContent = mrs.value;
+      renderPreviewOnly();
+    });
+  }
+
+  // Open select articles overlay
+  const openBtn = document.getElementById('openSelectArticles');
+  if (openBtn) {
+    openBtn.addEventListener('click', () => {
+      openSelectArticles();
+    });
+  }
+
+  // If overlay is open, initialize its table
+  if (state.selectArticlesOpen) {
+    renderSelectArticlesOverlay();
+    // Close on backdrop click
+    const overlay = document.getElementById('selectArticlesOverlay');
+    if (overlay) {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeSelectArticles();
+      });
+    }
+  }
+
+  // ─── DRAG AND DROP ─────────────────────────────────────────
+  bindDragAndDrop();
+}
+
+function bindDragAndDrop() {
+  let draggedId = null;
+  let draggedType = null;
+  let draggedParentId = null;
+
+  // Track whether drag should be allowed (only from handle)
+  let dragAllowed = false;
+
+  document.querySelectorAll('.cat-row[draggable="true"]').forEach(row => {
+
+    row.querySelector('.drag-handle')?.addEventListener('mousedown', () => {
+      dragAllowed = true;
+    });
+
+    row.addEventListener('dragstart', (e) => {
+      if (!dragAllowed) { e.preventDefault(); return; }
+      dragAllowed = false;
+      draggedId = row.dataset.catId;
+      draggedType = row.dataset.catType;
+      draggedParentId = row.dataset.parentId || null;
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', draggedId);
+    });
+
+    row.addEventListener('dragover', (e) => {
+      if (!draggedId) return;
+      const targetId = row.dataset.catId;
+      const targetType = row.dataset.catType;
+      const targetParentId = row.dataset.parentId || null;
+
+      // Enforce: parents only among parents, subs only within same parent
+      if (draggedType === 'parent' && targetType !== 'parent') return;
+      if (draggedType === 'sub' && (targetType !== 'sub' || targetParentId !== draggedParentId)) return;
+      if (targetId === draggedId) return;
+
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+
+      // Determine above/below based on mouse position
+      const rect = row.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      clearDropIndicators();
+      if (e.clientY < midY) {
+        row.classList.add('drop-above');
+      } else {
+        row.classList.add('drop-below');
+      }
+    });
+
+    row.addEventListener('dragleave', (e) => {
+      row.classList.remove('drop-above', 'drop-below');
+    });
+
+    row.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (!draggedId) return;
+      const targetId = row.dataset.catId;
+      const targetType = row.dataset.catType;
+      const targetParentId = row.dataset.parentId || null;
+
+      // Same validation as dragover
+      if (draggedType === 'parent' && targetType !== 'parent') return;
+      if (draggedType === 'sub' && (targetType !== 'sub' || targetParentId !== draggedParentId)) return;
+      if (targetId === draggedId) return;
+
+      const rect = row.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      const insertAfter = e.clientY >= midY;
+
+      // Perform the reorder
+      if (draggedType === 'parent') {
+        reorderInArray(mockData.categories, draggedId, targetId, insertAfter);
+      } else {
+        // Subcategory: reorder within parent's children
+        const parent = findCategory(draggedParentId);
+        if (parent && parent.children) {
+          reorderInArray(parent.children, draggedId, targetId, insertAfter);
+        }
+      }
+
+      clearDropIndicators();
+      draggedId = null;
+      draggedType = null;
+      draggedParentId = null;
+      render();
+    });
+
+    row.addEventListener('dragend', (e) => {
+      row.classList.remove('dragging');
+      clearDropIndicators();
+      draggedId = null;
+      draggedType = null;
+      draggedParentId = null;
+      dragAllowed = false;
+    });
+  });
+
+  function clearDropIndicators() {
+    document.querySelectorAll('.cat-row.drop-above, .cat-row.drop-below').forEach(el => {
+      el.classList.remove('drop-above', 'drop-below');
+    });
+  }
+
+  function reorderInArray(arr, draggedId, targetId, insertAfter) {
+    const fromIdx = arr.findIndex(c => c.id === draggedId);
+    const toIdx = arr.findIndex(c => c.id === targetId);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const [item] = arr.splice(fromIdx, 1);
+    // Recalculate target index after removal
+    let newIdx = arr.findIndex(c => c.id === targetId);
+    if (insertAfter) newIdx += 1;
+    arr.splice(newIdx, 0, item);
+  }
+}
+
+// Partial re-render for sliders (perf)
+function renderPreviewOnly() {
+  const container = document.querySelector('.flex-1.flex.items-center.justify-center');
+  if (container) {
+    const isWide = state.screenMode === 'wide';
+    const cols = isWide ? state.wideColumns : state.mobileColumns;
+    const rowH = rowHeightToPx(isWide ? state.wideRowHeight : state.mobileRowHeight);
+    const grids = container.querySelectorAll('.grid');
+    grids.forEach(grid => {
+      grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+      grid.querySelectorAll('[style*="height"]').forEach(el => {
+        el.style.height = rowH + 'px';
+      });
+    });
+  }
+}
+
+// ─── INIT ───────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
