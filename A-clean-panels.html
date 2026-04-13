@@ -73,24 +73,24 @@ const mockData = {
     { id: "u5", name: "Voucher 500", price: 500, productGroup: "Gift cards", articleNr: "", created: "2026-03-25" }
   ],
   categories: [
-    { id: "cat1", name: "Sandwiches", color: "#e67e22", active: true, children: [], articles: [
+    { id: "cat1", name: "Sandwiches", nameSv: "Smörgåsar", color: "#e67e22", active: true, children: [], articles: [
       { id: "a1", name: "Club Sandwich", price: 125, productGroup: "Mat", articleNr: "1001", created: "2025-01-28" },
       { id: "a2", name: "BLT", price: 95, productGroup: "Mat", articleNr: "", created: "2025-03-12" },
       { id: "a3", name: "Veggie Wrap", price: 110, productGroup: "Mat", articleNr: "", created: "2024-11-05" },
       { id: "a4", name: "Tuna Melt", price: 105, productGroup: "Mat", articleNr: "1004", created: "2024-08-20" },
       { id: "a5", name: "Grilled Cheese", price: 85, productGroup: "Mat", articleNr: "", created: "2023-06-15" }
     ]},
-    { id: "cat2", name: "Pizza", color: "#27ae60", active: true, children: [
-      { id: "sub2a", name: "Classic Pizza", color: "#2ecc71", active: true, articles: [
+    { id: "cat2", name: "Pizza", nameSv: "Pizza", color: "#27ae60", active: true, children: [
+      { id: "sub2a", name: "Classic Pizza", nameSv: "Klassisk pizza", color: "#2ecc71", active: true, articles: [
         { id: "a6", name: "Margherita", price: 120, productGroup: "Mat", articleNr: "", created: "2023-09-01" },
         { id: "a7", name: "Quattro Formaggi", price: 145, productGroup: "Mat", articleNr: "", created: "2024-02-14" }
       ]},
-      { id: "sub2b", name: "Special Pizza", color: "#1abc9c", active: true, articles: [
+      { id: "sub2b", name: "Special Pizza", nameSv: "Specialpizza", color: "#1abc9c", active: true, articles: [
         { id: "a8", name: "Diavola", price: 140, productGroup: "Mat", articleNr: "", created: "2024-05-22" },
         { id: "a9", name: "Pizza Bianca", price: 170, productGroup: "Mat", articleNr: "1009", created: "2025-01-10" }
       ]}
     ], articles: []},
-    { id: "cat3", name: "Appetizers", color: "#d4780a", active: true, children: [], articles: [
+    { id: "cat3", name: "Appetizers", nameSv: "Förrätter", color: "#d4780a", active: true, children: [], articles: [
       { id: "a10", name: "Antipasto del Magazzino", price: 241.50, productGroup: "Mat", articleNr: "", created: "2024-03-18" },
       { id: "a11", name: "Vitello Tonnato", price: 185, productGroup: "Mat", articleNr: "", created: "2024-07-25" },
       { id: "a12", name: "Bruschette Paesane", price: 165, productGroup: "Mat", articleNr: "", created: "2023-12-01" },
@@ -100,30 +100,30 @@ const mockData = {
       { id: "a16", name: "Kvällens Antipasti", price: 750, productGroup: "Mat", articleNr: "", created: "2024-01-20" },
       { id: "a17", name: "Charkbricka", price: 80, productGroup: "Mat", articleNr: "", created: "2023-10-05" }
     ]},
-    { id: "cat4", name: "Pasta", color: "#f1c40f", active: true, children: [], articles: [
+    { id: "cat4", name: "Pasta", nameSv: "Pasta", color: "#f1c40f", active: true, children: [], articles: [
       { id: "a18", name: "Carbonara", price: 155, productGroup: "Mat", articleNr: "", created: "2023-08-14" },
       { id: "a19", name: "Bolognese", price: 145, productGroup: "Mat", articleNr: "", created: "2024-04-03" },
       { id: "a20", name: "Pesto Genovese", price: 135, productGroup: "Mat", articleNr: "", created: "2024-06-19" },
       { id: "a21", name: "Cacio e Pepe", price: 140, productGroup: "Mat", articleNr: "", created: "2025-03-01" }
     ]},
-    { id: "cat5", name: "Burgers", color: "#3498db", active: true, children: [], articles: [
+    { id: "cat5", name: "Burgers", nameSv: "Burgare", color: "#3498db", active: true, children: [], articles: [
       { id: "a22", name: "Classic Burger", price: 165, productGroup: "Mat", articleNr: "1022", created: "2023-07-22" },
       { id: "a23", name: "Halloumi Burger", price: 155, productGroup: "Mat", articleNr: "", created: "2024-10-30" },
       { id: "a24", name: "Double Smash", price: 195, productGroup: "Mat", articleNr: "", created: "2025-01-15" }
     ]},
-    { id: "cat6", name: "Drinks", color: "#9b59b6", active: true, children: [
-      { id: "sub6a", name: "Hot Drinks", color: "#8e44ad", active: true, articles: [
+    { id: "cat6", name: "Drinks", nameSv: "Drycker", color: "#9b59b6", active: true, children: [
+      { id: "sub6a", name: "Hot Drinks", nameSv: "Varma drycker", color: "#8e44ad", active: true, articles: [
         { id: "a25", name: "Espresso", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-04-10" },
         { id: "a26", name: "Cappuccino", price: 49, productGroup: "Dryck", articleNr: "", created: "2023-04-10" },
         { id: "a27", name: "Latte", price: 55, productGroup: "Dryck", articleNr: "", created: "2024-01-05" },
         { id: "a28", name: "Tea", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-11-18" }
       ]},
-      { id: "sub6b", name: "Cold Drinks", color: "#2980b9", active: true, articles: [
+      { id: "sub6b", name: "Cold Drinks", nameSv: "Kalla drycker", color: "#2980b9", active: true, articles: [
         { id: "a29", name: "Coca-Cola", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-03-20" },
         { id: "a30", name: "Sparkling Water", price: 29, productGroup: "Dryck", articleNr: "", created: "2023-03-20" },
         { id: "a31", name: "Juice", price: 45, productGroup: "Dryck", articleNr: "", created: "2024-05-14" }
       ]},
-      { id: "sub6c", name: "Beer & Wine", color: "#c0392b", active: false, articles: [
+      { id: "sub6c", name: "Beer & Wine", nameSv: "Öl & Vin", color: "#c0392b", active: false, articles: [
         { id: "a32", name: "IPA", price: 79, productGroup: "Dryck", articleNr: "", created: "2024-02-28" },
         { id: "a33", name: "Lager", price: 69, productGroup: "Dryck", articleNr: "", created: "2024-02-28" },
         { id: "a34", name: "House Red", price: 89, productGroup: "Dryck", articleNr: "", created: "2023-09-15" },
@@ -131,7 +131,7 @@ const mockData = {
         { id: "a36", name: "Prosecco", price: 95, productGroup: "Dryck", articleNr: "", created: "2024-12-01" }
       ]}
     ], articles: []},
-    { id: "cat7", name: "Desserts", color: "#795548", active: true, children: [], articles: [
+    { id: "cat7", name: "Desserts", nameSv: "Efterrätter", color: "#795548", active: true, children: [], articles: [
       { id: "a37", name: "Tiramisu", price: 95, productGroup: "Mat", articleNr: "", created: "2024-06-08" },
       { id: "a38", name: "Panna Cotta", price: 85, productGroup: "Mat", articleNr: "", created: "2024-06-08" },
       { id: "a39", name: "Gelato", price: 65, productGroup: "Mat", articleNr: "", created: "2025-02-20" }
@@ -141,6 +141,7 @@ const mockData = {
 
 // ─── APP STATE ──────────────────────────────────────────────
 const state = {
+  lang: 'en',                // 'en' | 'sv'
   scope: 'company',          // 'company' | 'costcenter' | 'register'
   selectedCC: 'cc1',
   selectedCR: 'pos1',
@@ -168,6 +169,140 @@ mockData.costCenters.forEach(cc => {
 // ─── HELPERS ────────────────────────────────────────────────
 function icon(name, extra = '') {
   return `<span class="material-symbols-outlined ${extra}">${name}</span>`;
+}
+
+// ─── TRANSLATIONS ────────────────────────────────────────────
+const translations = {
+  en: {
+    cashRegisterLayout: 'Cash register layout',
+    company: 'Company',
+    costCenter: 'Cost Center',
+    cashRegister: 'Cash Register',
+    wide: 'Wide',
+    mobile: 'Mobile',
+    categories: 'CATEGORIES',
+    category: 'Category',
+    name: 'Name',
+    color: 'Color',
+    active: 'Active',
+    wideScreenConfig: 'Wide Screen Config',
+    mobileScreenConfig: 'Mobile Screen Config',
+    appliedToAllCategories: 'Applied to all categories',
+    columns: 'Columns',
+    rowHeight: 'Row height',
+    articles: 'Articles',
+    articlesAssigned: 'articles assigned',
+    selectArticles: 'Select articles',
+    search: 'Search',
+    selectAll: 'Select all',
+    deselectAll: 'Deselect all',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+    productGroup: 'Product group',
+    articleNr: 'Art.Nr',
+    price: 'Price',
+    created: 'Created',
+    addCategory: 'Add category',
+    addSubcategory: 'Add subcategory',
+    selectCategory: 'Select a category',
+    noArticlesAssigned: 'No articles assigned',
+    inheritFromParent: 'Inherit from parent scope',
+    selected: 'selected',
+    deleteCategory: 'Delete category',
+    dashboard: 'Dashboard',
+    actions: 'Actions',
+    receipts: 'Receipts',
+    vouchers: 'Vouchers',
+    deliveryInfo: 'Delivery info',
+    layout: 'Layout',
+    export: 'Export',
+    reports: 'Reports',
+    settings: 'Settings',
+    printer: 'Printer',
+    onlineOrders: 'Online orders',
+    salesMgmt: 'Sales mgmt',
+    storage: 'Storage',
+    help: 'Help',
+    inheritingLayout: 'Inheriting layout from Company.',
+    customize: 'Customize',
+    customLayoutOverrides: 'Custom layout — overrides Company defaults.',
+    resetToInherited: 'Reset to inherited',
+    addCategoryComingSoon: 'Add category — coming soon',
+    giftCards: 'Gift cards',
+    unassigned: 'Unassigned',
+  },
+  sv: {
+    cashRegisterLayout: 'Kassalayout',
+    company: 'Företag',
+    costCenter: 'Kostnadsställe',
+    cashRegister: 'Kassa',
+    wide: 'Bred',
+    mobile: 'Mobil',
+    categories: 'KATEGORIER',
+    category: 'Kategori',
+    name: 'Namn',
+    color: 'Färg',
+    active: 'Aktiv',
+    wideScreenConfig: 'Bred skärm',
+    mobileScreenConfig: 'Mobil skärm',
+    appliedToAllCategories: 'Gäller alla kategorier',
+    columns: 'Kolumner',
+    rowHeight: 'Radhöjd',
+    articles: 'Artiklar',
+    articlesAssigned: 'artiklar tilldelade',
+    selectArticles: 'Välj artiklar',
+    search: 'Sök',
+    selectAll: 'Välj alla',
+    deselectAll: 'Avmarkera alla',
+    cancel: 'Avbryt',
+    confirm: 'Bekräfta',
+    productGroup: 'Produktgrupp',
+    articleNr: 'Art.nr',
+    price: 'Pris',
+    created: 'Skapad',
+    addCategory: 'Lägg till kategori',
+    addSubcategory: 'Lägg till underkategori',
+    selectCategory: 'Välj en kategori',
+    noArticlesAssigned: 'Inga artiklar tilldelade',
+    inheritFromParent: 'Ärv från överordnad nivå',
+    selected: 'valda',
+    deleteCategory: 'Ta bort kategori',
+    dashboard: 'Översikt',
+    actions: 'Åtgärder',
+    receipts: 'Kvitton',
+    vouchers: 'Värdebevis',
+    deliveryInfo: 'Leveransinfo',
+    layout: 'Layout',
+    export: 'Exportera',
+    reports: 'Rapporter',
+    settings: 'Inställningar',
+    printer: 'Skrivare',
+    onlineOrders: 'Onlineorder',
+    salesMgmt: 'Försäljning',
+    storage: 'Lager',
+    help: 'Hjälp',
+    inheritingLayout: 'Ärver layout från Företag.',
+    customize: 'Anpassa',
+    customLayoutOverrides: 'Anpassad layout — åsidosätter företagets standard.',
+    resetToInherited: 'Återställ till ärvd',
+    addCategoryComingSoon: 'Lägg till kategori — kommer snart',
+    giftCards: 'Presentkort',
+    unassigned: 'Ej tilldelad',
+  }
+};
+
+function t(key) {
+  return translations[state.lang][key] || translations.en[key] || key;
+}
+
+function catName(cat) {
+  return state.lang === 'sv' ? (cat.nameSv || cat.name) : cat.name;
+}
+
+// Product group translation
+function pgName(pg) {
+  if (state.lang === 'sv' && pg === 'Gift cards') return t('giftCards');
+  return pg;
 }
 
 function findCategory(id, cats = mockData.categories) {
@@ -198,7 +333,7 @@ function allArticles() {
   const list = [];
   function walk(cats) {
     for (const c of cats) {
-      (c.articles || []).forEach(a => list.push({ ...a, catId: c.id, catName: c.name }));
+      (c.articles || []).forEach(a => list.push({ ...a, catId: c.id, catName: catName(c) }));
       if (c.children) walk(c.children);
     }
   }
@@ -226,13 +361,13 @@ function getAllArticlesFlat() {
   const list = [];
   function walk(cats) {
     for (const c of cats) {
-      (c.articles || []).forEach(a => list.push({ ...a, catId: c.id, catName: c.name, catColor: c.color }));
+      (c.articles || []).forEach(a => list.push({ ...a, catId: c.id, catName: catName(c), catColor: c.color }));
       if (c.children) walk(c.children);
     }
   }
   walk(mockData.categories);
   // Add unassigned articles
-  (mockData.unassignedArticles || []).forEach(a => list.push({ ...a, catId: null, catName: 'Unassigned', catColor: '#9ca3af' }));
+  (mockData.unassignedArticles || []).forEach(a => list.push({ ...a, catId: null, catName: t('unassigned'), catColor: '#9ca3af' }));
   return list;
 }
 
@@ -353,22 +488,22 @@ function getVisibleCategories() {
 
 // ─── SIDEBAR NAV ────────────────────────────────────────────
 const navItems = [
-  { icon: 'dashboard', label: 'Dashboard' },
-  { icon: 'inventory_2', label: 'Articles' },
-  { icon: 'bolt', label: 'Actions' },
-  { icon: 'receipt_long', label: 'Receipts' },
-  { icon: 'card_giftcard', label: 'Vouchers' },
-  { icon: 'local_shipping', label: 'Delivery info' },
-  { icon: 'grid_view', label: 'Layout', active: true },
-  { icon: 'upload', label: 'Export' },
-  { icon: 'bar_chart', label: 'Reports' },
-  { icon: 'business', label: 'Company' },
-  { icon: 'settings', label: 'Settings' },
-  { icon: 'print', label: 'Printer' },
-  { icon: 'shopping_cart', label: 'Online orders' },
-  { icon: 'point_of_sale', label: 'Sales mgmt' },
-  { icon: 'warehouse', label: 'Storage' },
-  { icon: 'help', label: 'Help' },
+  { icon: 'dashboard', tKey: 'dashboard' },
+  { icon: 'inventory_2', tKey: 'articles' },
+  { icon: 'bolt', tKey: 'actions' },
+  { icon: 'receipt_long', tKey: 'receipts' },
+  { icon: 'card_giftcard', tKey: 'vouchers' },
+  { icon: 'local_shipping', tKey: 'deliveryInfo' },
+  { icon: 'grid_view', tKey: 'layout', active: true },
+  { icon: 'upload', tKey: 'export' },
+  { icon: 'bar_chart', tKey: 'reports' },
+  { icon: 'business', tKey: 'company' },
+  { icon: 'settings', tKey: 'settings' },
+  { icon: 'print', tKey: 'printer' },
+  { icon: 'shopping_cart', tKey: 'onlineOrders' },
+  { icon: 'point_of_sale', tKey: 'salesMgmt' },
+  { icon: 'warehouse', tKey: 'storage' },
+  { icon: 'help', tKey: 'help' },
 ];
 
 // ─── RENDER ─────────────────────────────────────────────────
@@ -392,23 +527,23 @@ function render() {
 
 function renderSelectArticlesModal() {
   const cat = findCategory(state.selectedCategoryId);
-  const catName = cat ? cat.name : '';
+  const catLabel = cat ? catName(cat) : '';
   return `
   <div id="selectArticlesOverlay" class="fixed inset-0 z-50 flex justify-end" style="background:rgba(0,0,0,0.35)">
     <div class="bg-white shadow-2xl flex flex-col h-full" style="width:min(860px, 70vw);">
       <!-- Header -->
       <div class="px-6 pt-5 pb-3 border-b border-gray-200">
         <div class="flex items-center justify-between mb-1">
-          <h2 class="text-lg font-bold text-gray-900">Select articles</h2>
+          <h2 class="text-lg font-bold text-gray-900">${t('selectArticles')}</h2>
           <button onclick="closeSelectArticles()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
             ${icon('close', 'icon-sm')}
           </button>
         </div>
-        <p class="text-sm text-gray-500">${catName}</p>
+        <p class="text-sm text-gray-500">${catLabel}</p>
         <!-- Search -->
         <div class="relative mt-3">
           <span class="material-symbols-outlined icon-sm absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-          <input id="selectArticlesSearchInput" type="text" placeholder="Search" value="${state.selectArticlesSearch}"
+          <input id="selectArticlesSearchInput" type="text" placeholder="${t('search')}" value="${state.selectArticlesSearch}"
             class="w-full border border-gray-300 rounded-lg pl-10 pr-9 py-2 text-sm bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30" />
           ${state.selectArticlesSearch ? `
           <button onclick="state.selectArticlesSearch='';renderSelectArticlesOverlay();document.getElementById('selectArticlesSearchInput').focus();"
@@ -427,8 +562,8 @@ function renderSelectArticlesModal() {
       </div>
       <!-- Footer -->
       <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3">
-        <button onclick="closeSelectArticles()" class="px-5 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
-        <button onclick="confirmSelectArticles()" class="px-5 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-colors" style="background:#624fa6">Confirm</button>
+        <button onclick="closeSelectArticles()" class="px-5 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">${t('cancel')}</button>
+        <button onclick="confirmSelectArticles()" class="px-5 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-colors" style="background:#624fa6">${t('confirm')}</button>
       </div>
     </div>
   </div>`;
@@ -456,7 +591,7 @@ function renderSelectArticlesOverlay() {
 
   const allSelected = filtered.length > 0 && filtered.every(a => state.selectArticlesSelection.has(a.id));
   const selectAllBtn = document.getElementById('selectAllBtn');
-  if (selectAllBtn) selectAllBtn.textContent = allSelected ? 'Deselect all' : 'Select all';
+  if (selectAllBtn) selectAllBtn.textContent = allSelected ? t('deselectAll') : t('selectAll');
 
   function sortIcon(f) {
     if (state.selectArticlesSort.field !== f) return '';
@@ -469,12 +604,12 @@ function renderSelectArticlesOverlay() {
     <table class="w-full text-sm">
       <thead>
         <tr class="border-b border-gray-200 text-left">
-          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap" onclick="sortSelectArticles('name')" style="width:30%">Name${sortIcon('name')}</th>
-          <th class="py-2 pr-2 font-medium text-gray-500 text-xs whitespace-nowrap" style="width:10%">Category</th>
-          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap" onclick="sortSelectArticles('productGroup')" style="width:16%">Product group${sortIcon('productGroup')}</th>
-          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap" onclick="sortSelectArticles('articleNr')" style="width:12%">Art.Nr${sortIcon('articleNr')}</th>
-          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap text-right" onclick="sortSelectArticles('price')" style="width:14%">Price${sortIcon('price')}</th>
-          <th class="py-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap text-right" onclick="sortSelectArticles('created')" style="width:18%">Created${sortIcon('created')}</th>
+          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap" onclick="sortSelectArticles('name')" style="width:30%">${t('name')}${sortIcon('name')}</th>
+          <th class="py-2 pr-2 font-medium text-gray-500 text-xs whitespace-nowrap" style="width:10%">${t('category')}</th>
+          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap" onclick="sortSelectArticles('productGroup')" style="width:16%">${t('productGroup')}${sortIcon('productGroup')}</th>
+          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap" onclick="sortSelectArticles('articleNr')" style="width:12%">${t('articleNr')}${sortIcon('articleNr')}</th>
+          <th class="py-2 pr-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap text-right" onclick="sortSelectArticles('price')" style="width:14%">${t('price')}${sortIcon('price')}</th>
+          <th class="py-2 font-medium text-gray-500 text-xs cursor-pointer select-none whitespace-nowrap text-right" onclick="sortSelectArticles('created')" style="width:18%">${t('created')}${sortIcon('created')}</th>
         </tr>
       </thead>
       <tbody>
@@ -486,7 +621,7 @@ function renderSelectArticlesOverlay() {
             data-article-id="${a.id}">
             <td class="py-2 pr-2 truncate text-gray-800" style="max-width:0">${a.name}</td>
             <td class="py-2 pr-2"><span class="inline-block w-3 h-3 rounded-sm" style="background:${a.catColor}" title="${a.catName}"></span></td>
-            <td class="py-2 pr-2 text-gray-600 truncate" style="max-width:0">${a.productGroup || ''}</td>
+            <td class="py-2 pr-2 text-gray-600 truncate" style="max-width:0">${pgName(a.productGroup || '')}</td>
             <td class="py-2 pr-2 text-gray-600">${a.articleNr || ''}</td>
             <td class="py-2 pr-2 text-gray-800 text-right whitespace-nowrap">${formatPrice(a.price)}</td>
             <td class="py-2 text-gray-600 text-right whitespace-nowrap">${a.created || ''}</td>
@@ -530,7 +665,7 @@ function renderSidebar() {
         <button class="nav-item w-full flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors rounded-lg mb-0.5
           ${active ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100'}">
           ${icon(n.icon, 'icon-sm')}
-          <span>${n.label}</span>
+          <span>${t(n.tKey)}</span>
         </button>`;
       }).join('')}
     </nav>
@@ -540,9 +675,9 @@ function renderSidebar() {
 // ─── TOOLBAR ────────────────────────────────────────────────
 function renderToolbar() {
   const scopes = [
-    { key: 'company', label: 'Company' },
-    { key: 'costcenter', label: 'Cost Center' },
-    { key: 'register', label: 'Cash Register' },
+    { key: 'company', tKey: 'company' },
+    { key: 'costcenter', tKey: 'costCenter' },
+    { key: 'register', tKey: 'cashRegister' },
   ];
 
   let scopeDropdown = '';
@@ -561,13 +696,13 @@ function renderToolbar() {
 
   return `
   <header class="h-14 border-b border-gray-200 flex items-center px-5 shrink-0 bg-white">
-    <span class="text-2xl font-bold text-gray-900 mr-auto whitespace-nowrap">Cash register layout</span>
+    <span class="text-2xl font-bold text-gray-900 mr-auto whitespace-nowrap">${t('cashRegisterLayout')}</span>
     <div class="flex items-center gap-0 mx-auto">
       <div class="flex rounded-lg border border-gray-200 overflow-hidden">
         ${scopes.map(s => `
           <button data-scope="${s.key}" class="scope-btn px-4 py-1.5 text-sm font-medium transition-colors
             ${state.scope === s.key ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}">
-            ${s.label}
+            ${t(s.tKey)}
           </button>`).join('')}
       </div>
       ${scopeDropdown}
@@ -575,12 +710,16 @@ function renderToolbar() {
     <div class="flex items-center gap-1 ml-auto border border-gray-200 rounded-full p-0.5">
       <button data-screen="wide" class="screen-btn px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 transition-colors ${state.screenMode === 'wide' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}">
         ${icon('tablet_mac', 'icon-sm')}
-        <span>Wide</span>
+        <span>${t('wide')}</span>
       </button>
       <button data-screen="mobile" class="screen-btn px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 transition-colors ${state.screenMode === 'mobile' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}">
         ${icon('smartphone', 'icon-sm')}
-        <span>Mobile</span>
+        <span>${t('mobile')}</span>
       </button>
+    </div>
+    <div class="flex items-center bg-gray-100 rounded-md p-0.5 ml-3">
+      <button data-lang="en" class="lang-btn px-2 py-1 text-xs font-medium rounded ${state.lang === 'en' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500'}">EN</button>
+      <button data-lang="sv" class="lang-btn px-2 py-1 text-xs font-medium rounded ${state.lang === 'sv' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500'}">SV</button>
     </div>
   </header>`;
 }
@@ -595,15 +734,15 @@ function renderInheritanceBar() {
     return `
     <div class="h-10 flex items-center px-5 text-sm bg-purple-50 text-purple-800 border-b border-purple-200 shrink-0">
       ${icon('info', 'icon-xs mr-1')}
-      <span>Inheriting layout from Company.</span>
-      <button id="customizeBtn" class="ml-3 px-3 py-0.5 text-xs font-semibold bg-primary text-white rounded-md hover:opacity-90 transition-colors">Customize</button>
+      <span>${t('inheritingLayout')}</span>
+      <button id="customizeBtn" class="ml-3 px-3 py-0.5 text-xs font-semibold bg-primary text-white rounded-md hover:opacity-90 transition-colors">${t('customize')}</button>
     </div>`;
   } else {
     return `
     <div class="h-10 flex items-center px-5 text-sm bg-green-50 text-green-800 border-b border-green-200 shrink-0">
       ${icon('check_circle', 'icon-xs mr-1')}
-      <span>Custom layout — overrides Company defaults.</span>
-      <button id="resetBtn" class="ml-3 text-xs font-semibold underline text-green-700 hover:text-green-900 transition-colors">Reset to inherited</button>
+      <span>${t('customLayoutOverrides')}</span>
+      <button id="resetBtn" class="ml-3 text-xs font-semibold underline text-green-700 hover:text-green-900 transition-colors">${t('resetToInherited')}</button>
     </div>`;
   }
 }
@@ -639,7 +778,7 @@ function renderCategoryTree() {
             <span class="material-symbols-outlined icon-xs text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}">${'chevron_right'}</span>
           </button>
         ` : '<span class="w-5 shrink-0"></span>'}
-        <span class="flex-1 text-sm font-medium truncate mx-1 text-gray-800 ${!isActive ? 'line-through' : ''}">${cat.name}</span>
+        <span class="flex-1 text-sm font-medium truncate mx-1 text-gray-800 ${!isActive ? 'line-through' : ''}">${catName(cat)}</span>
         <button class="toggle-active-btn shrink-0 w-9 h-5 mx-2 relative rounded-full transition-colors ${isActive ? 'bg-primary' : 'bg-gray-300'}"
           data-active-id="${cat.id}">
           <span class="absolute top-0.5 ${isActive ? 'right-0.5' : 'left-0.5'} w-4 h-4 bg-white rounded-full shadow transition-all"></span>
@@ -652,8 +791,8 @@ function renderCategoryTree() {
   return `
   <div class="w-72 border-r border-gray-200 flex flex-col h-full shrink-0 bg-white">
     <div class="flex items-center justify-between px-4 h-11 border-b border-gray-200 shrink-0">
-      <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Categories</span>
-      <button onclick="alert('Add category — coming soon')" class="w-7 h-7 flex items-center justify-center rounded-md text-primary hover:bg-gray-100 transition-colors">
+      <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">${t('categories')}</span>
+      <button onclick="alert(t('addCategoryComingSoon'))" class="w-7 h-7 flex items-center justify-center rounded-md text-primary hover:bg-gray-100 transition-colors">
         ${icon('add', 'icon-sm')}
       </button>
     </div>
@@ -755,7 +894,7 @@ function renderWidePreview(cols, rowH) {
             ${!sc.active ? 'opacity-40' : ''}"
             style="${isActive ? `background:${sc.color}` : ''}"
             data-preview-cat="${sc.id}">
-            ${sc.name}
+            ${catName(sc)}
           </button>`;
         }).join('')}
       </div>`;
@@ -780,7 +919,7 @@ function renderWidePreview(cols, rowH) {
                 ${isActive ? 'bg-gray-200' : 'hover:bg-gray-100'}"
                 data-preview-parent="${p.id}">
                 <span class="w-3 h-3 rounded-full shrink-0" style="background:${p.color}"></span>
-                <span class="text-[9px] font-medium leading-tight ${isActive ? 'text-gray-900' : 'text-gray-500'} ${!p.active ? 'opacity-40 line-through' : ''}">${p.name}</span>
+                <span class="text-[9px] font-medium leading-tight ${isActive ? 'text-gray-900' : 'text-gray-500'} ${!p.active ? 'opacity-40 line-through' : ''}">${catName(p)}</span>
               </button>`;
             }).join('')}
           </div>
@@ -837,7 +976,7 @@ function renderMobilePreview(cols, rowH) {
           ${!p.active ? 'opacity-40' : ''}"
           style="${isActive ? `background:${p.color}` : ''}"
           data-preview-parent="${p.id}">
-          ${p.name}
+          ${catName(p)}
         </button>`;
       }).join('')}
     </div>`;
@@ -856,7 +995,7 @@ function renderMobilePreview(cols, rowH) {
             ${!sc.active ? 'opacity-40' : ''}"
             style="${isActive ? `background:${sc.color}` : ''}"
             data-preview-cat="${sc.id}">
-            ${sc.name}
+            ${catName(sc)}
           </button>`;
         }).join('')}
       </div>`;
@@ -887,7 +1026,7 @@ function renderSettingsPanel() {
   if (!cat) {
     return `
     <div class="w-80 border-l border-gray-200 bg-white flex items-center justify-center text-sm text-gray-500 shrink-0">
-      Select a category
+      ${t('selectCategory')}
     </div>`;
   }
 
@@ -900,11 +1039,11 @@ function renderSettingsPanel() {
 
       <!-- Category settings -->
       <div>
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Category</h3>
-        <label class="block text-sm text-gray-500 mb-1">Name</label>
-        <input id="catNameInput" type="text" value="${cat.name}" class="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30" />
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">${t('category')}</h3>
+        <label class="block text-sm text-gray-500 mb-1">${t('name')}</label>
+        <input id="catNameInput" type="text" value="${catName(cat)}" class="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30" />
 
-        <label class="block text-sm text-gray-500 mt-3 mb-1">Color</label>
+        <label class="block text-sm text-gray-500 mt-3 mb-1">${t('color')}</label>
         <div class="grid grid-cols-8 gap-2">
           ${presetColors.map(c => `
             <button class="color-swatch w-7 h-7 rounded-full border-2 transition-all ${cat.color === c ? 'border-gray-900 scale-110 ring-2 ring-gray-300' : 'border-transparent hover:scale-105'}"
@@ -913,7 +1052,7 @@ function renderSettingsPanel() {
         </div>
 
         <div class="flex items-center justify-between mt-3">
-          <span class="text-sm text-gray-500">Active</span>
+          <span class="text-sm text-gray-500">${t('active')}</span>
           <button id="catActiveToggle" class="w-10 h-5 relative rounded-full transition-colors ${cat.active ? 'bg-primary' : 'bg-gray-300'}">
             <span class="absolute top-0.5 ${cat.active ? 'right-0.5' : 'left-0.5'} w-4 h-4 bg-white rounded-full shadow transition-all"></span>
           </button>
@@ -924,15 +1063,15 @@ function renderSettingsPanel() {
 
       <!-- Wide screen config -->
       <div>
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Wide Screen Config</h3>
-        <p class="text-[10px] text-gray-400 italic mb-2">Applied to all categories</p>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">${t('wideScreenConfig')}</h3>
+        <p class="text-[10px] text-gray-400 italic mb-2">${t('appliedToAllCategories')}</p>
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm text-gray-500">Columns</span>
+          <span class="text-sm text-gray-500">${t('columns')}</span>
           <span class="text-sm font-semibold text-gray-900" id="wideColVal">${state.wideColumns}</span>
         </div>
         <input type="range" id="wideColSlider" min="1" max="10" value="${state.wideColumns}" class="w-full mb-3" />
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm text-gray-500">Row height</span>
+          <span class="text-sm text-gray-500">${t('rowHeight')}</span>
           <span class="text-sm font-semibold text-gray-900" id="wideRowVal">${state.wideRowHeight}</span>
         </div>
         <input type="range" id="wideRowSlider" min="1" max="10" value="${state.wideRowHeight}" class="w-full" />
@@ -942,15 +1081,15 @@ function renderSettingsPanel() {
 
       <!-- Mobile screen config -->
       <div>
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Mobile Screen Config</h3>
-        <p class="text-[10px] text-gray-400 italic mb-2">Applied to all categories</p>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">${t('mobileScreenConfig')}</h3>
+        <p class="text-[10px] text-gray-400 italic mb-2">${t('appliedToAllCategories')}</p>
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm text-gray-500">Columns</span>
+          <span class="text-sm text-gray-500">${t('columns')}</span>
           <span class="text-sm font-semibold text-gray-900" id="mobileColVal">${state.mobileColumns}</span>
         </div>
         <input type="range" id="mobileColSlider" min="1" max="10" value="${state.mobileColumns}" class="w-full mb-3" />
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm text-gray-500">Row height</span>
+          <span class="text-sm text-gray-500">${t('rowHeight')}</span>
           <span class="text-sm font-semibold text-gray-900" id="mobileRowVal">${state.mobileRowHeight}</span>
         </div>
         <input type="range" id="mobileRowSlider" min="1" max="10" value="${state.mobileRowHeight}" class="w-full" />
@@ -960,11 +1099,11 @@ function renderSettingsPanel() {
 
       <!-- Articles -->
       <div>
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Articles</h3>
-        <p class="text-sm text-gray-600 mb-2">${articles.length} articles assigned</p>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">${t('articles')}</h3>
+        <p class="text-sm text-gray-600 mb-2">${articles.length} ${t('articlesAssigned')}</p>
         <button id="openSelectArticles" class="w-full py-2 px-4 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
           <span class="material-symbols-outlined" style="font-size:18px;">edit_note</span>
-          Select articles
+          ${t('selectArticles')}
         </button>
       </div>
 
@@ -1009,6 +1148,14 @@ function bindEvents() {
       render();
     });
   }
+
+  // Language toggle
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.lang = btn.dataset.lang;
+      render();
+    });
+  });
 
   // Screen toggle
   document.querySelectorAll('.screen-btn').forEach(btn => {
@@ -1088,7 +1235,11 @@ function bindEvents() {
   if (nameInput) {
     nameInput.addEventListener('input', () => {
       const cat = findCategory(state.selectedCategoryId);
-      if (cat) { cat.name = nameInput.value; render(); }
+      if (cat) {
+        if (state.lang === 'sv') { cat.nameSv = nameInput.value; }
+        else { cat.name = nameInput.value; }
+        render();
+      }
     });
   }
 

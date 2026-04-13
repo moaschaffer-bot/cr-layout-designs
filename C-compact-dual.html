@@ -93,16 +93,16 @@ tailwind.config = {
   <div class="flex items-center gap-2 shrink-0">
     <span class="text-sm font-bold text-primary font-headline tracking-wide">OPEN</span>
     <span class="text-gray-300 text-xs">|</span>
-    <span class="text-xs text-gray-500">BackOffice</span>
+    <span id="breadcrumbBackoffice" class="text-xs text-gray-500">BackOffice</span>
     <span class="material-symbols-outlined xs text-gray-400">chevron_right</span>
-    <span class="text-xs text-gray-800">CR Layout</span>
+    <span id="breadcrumbCrLayout" class="text-xs text-gray-800">CR Layout</span>
   </div>
   <!-- Center: Scope -->
   <div class="flex-1 flex items-center justify-center gap-2">
     <div id="scopeControl" class="relative flex items-center bg-white rounded-md border border-gray-200">
-      <button data-scope="company" class="scope-btn text-xs px-3 py-1 rounded-md transition-all bg-primary text-white">Company</button>
-      <button data-scope="cc" class="scope-btn text-xs px-3 py-1 rounded-md transition-all text-gray-600 hover:bg-gray-50 border border-transparent">Cost Center</button>
-      <button data-scope="cr" class="scope-btn text-xs px-3 py-1 rounded-md transition-all text-gray-600 hover:bg-gray-50 border border-transparent">Register</button>
+      <button data-scope="company" class="scope-btn text-xs px-3 py-1 rounded-md transition-all bg-primary text-white" id="scopeBtnCompany">Company</button>
+      <button data-scope="cc" class="scope-btn text-xs px-3 py-1 rounded-md transition-all text-gray-600 hover:bg-gray-50 border border-transparent" id="scopeBtnCC">Cost Center</button>
+      <button data-scope="cr" class="scope-btn text-xs px-3 py-1 rounded-md transition-all text-gray-600 hover:bg-gray-50 border border-transparent" id="scopeBtnCR">Register</button>
     </div>
     <div id="scopeChip" class="hidden items-center gap-1 bg-gray-100 text-xs text-gray-600 px-2 py-0.5 rounded-md border border-gray-200">
       <span id="scopeChipText"></span>
@@ -115,6 +115,11 @@ tailwind.config = {
   <!-- Right -->
   <div class="flex items-center gap-2 shrink-0">
     <span id="inheritanceBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-200">Inherited</span>
+    <span class="text-gray-300 text-xs">|</span>
+    <div id="langToggle" class="flex items-center bg-gray-100 rounded p-0.5">
+      <button onclick="setLang('en')" id="langBtnEn" class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-white text-gray-800 shadow-sm">EN</button>
+      <button onclick="setLang('sv')" id="langBtnSv" class="px-1.5 py-0.5 text-[10px] font-medium rounded text-gray-500">SV</button>
+    </div>
     <span class="text-gray-300 text-xs">|</span>
     <button id="helpBtn" class="w-6 h-6 flex items-center justify-center rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors">
       <span class="material-symbols-outlined sm">help_outline</span>
@@ -170,9 +175,9 @@ tailwind.config = {
     <!-- Tree -->
     <div id="treeContainer" class="flex-1 overflow-y-auto px-1 pb-2"></div>
     <!-- Bottom buttons -->
-    <div class="p-2 flex gap-1 border-t border-gray-200">
-      <button class="text-[10px] border border-gray-200 px-2 py-1 rounded-md text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex-1">+ Category</button>
-      <button class="text-[10px] border border-gray-200 px-2 py-1 rounded-md text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex-1">+ Subcategory</button>
+    <div id="treeBtnContainer" class="p-2 flex gap-1 border-t border-gray-200">
+      <button id="btnAddCategory" class="text-[10px] border border-gray-200 px-2 py-1 rounded-md text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex-1">+ Category</button>
+      <button id="btnAddSubcategory" class="text-[10px] border border-gray-200 px-2 py-1 rounded-md text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex-1">+ Subcategory</button>
     </div>
   </div>
 
@@ -180,7 +185,7 @@ tailwind.config = {
   <div id="previewArea" class="flex-1 flex gap-3 p-3 items-start overflow-auto bg-gray-50">
     <!-- Wide (Tablet) Preview -->
     <div class="flex flex-col gap-1 flex-[65] min-w-0">
-      <span class="text-[10px] uppercase tracking-widest text-gray-500 font-medium">Wide (Tablet)</span>
+      <span id="previewLabelWide" class="text-[10px] uppercase tracking-widest text-gray-500 font-medium">Wide (Tablet)</span>
       <div id="widePreview" class="border border-gray-200 bg-white rounded-lg overflow-hidden flex shadow-sm" style="min-height:420px;">
         <!-- Left: parent categories sidebar -->
         <div id="wideCatSidebar" class="w-28 shrink-0 border-r border-gray-200 bg-gray-50 overflow-y-auto flex flex-col py-1"></div>
@@ -193,7 +198,7 @@ tailwind.config = {
     </div>
     <!-- Mobile Preview -->
     <div class="flex flex-col gap-1 flex-[35] min-w-0 max-w-[280px]">
-      <span class="text-[10px] uppercase tracking-widest text-gray-500 font-medium">Mobile</span>
+      <span id="previewLabelMobile" class="text-[10px] uppercase tracking-widest text-gray-500 font-medium">Mobile</span>
       <div id="mobilePreview" class="border border-gray-200 bg-white rounded-xl overflow-hidden flex flex-col shadow-sm" style="max-width:260px;min-height:540px;">
         <div id="mobileTabBar" class="flex overflow-x-auto border-b border-gray-200 bg-gray-50"></div>
         <div id="mobileSubcatBar" class="hidden flex overflow-x-auto gap-1 px-2 py-1 border-b border-gray-200 bg-white"></div>
@@ -205,7 +210,7 @@ tailwind.config = {
   <!-- PROPERTY INSPECTOR -->
   <div id="inspector" class="w-72 bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto">
     <div class="p-3 border-b border-gray-200">
-      <h3 class="text-xs font-medium text-gray-800 font-headline">Properties</h3>
+      <h3 id="inspectorTitle" class="text-xs font-medium text-gray-800 font-headline">Properties</h3>
     </div>
     <div id="inspectorContent" class="flex-1 overflow-y-auto"></div>
   </div>
@@ -233,7 +238,7 @@ tailwind.config = {
 <div id="saSheet" class="sa-sheet">
   <div class="px-5 pt-5 pb-3 border-b border-gray-200 shrink-0">
     <div class="flex items-center justify-between mb-1">
-      <h2 class="text-sm font-semibold text-gray-800 font-headline">Select articles</h2>
+      <h2 id="saTitle" class="text-sm font-semibold text-gray-800 font-headline">Select articles</h2>
       <button id="saCloseX" class="material-symbols-outlined text-gray-400 hover:text-gray-600 cursor-pointer" style="font-size:20px;">close</button>
     </div>
     <div id="saCategoryName" class="text-xs text-gray-500 mb-3"></div>
@@ -249,8 +254,8 @@ tailwind.config = {
   </div>
   <div class="flex-1 overflow-y-auto" id="saTableContainer"></div>
   <div class="px-5 py-3 border-t border-gray-200 flex items-center justify-end gap-2 shrink-0 bg-white">
-    <button id="saCancelBtn" class="px-4 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
-    <button id="saConfirmBtn" class="px-4 py-1.5 text-xs font-medium text-white rounded-md hover:opacity-90 transition-colors cursor-pointer" style="background:#624fa6;">Confirm</button>
+    <button id="saCancelBtn" class="px-4 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"><span id="saCancelText">Cancel</span></button>
+    <button id="saConfirmBtn" class="px-4 py-1.5 text-xs font-medium text-white rounded-md hover:opacity-90 transition-colors cursor-pointer" style="background:#624fa6;"><span id="saConfirmText">Confirm</span></button>
   </div>
 </div>
 
@@ -258,10 +263,10 @@ tailwind.config = {
 <div id="shortcutsModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 hidden items-center justify-center">
   <div class="bg-white border border-gray-200 rounded-xl p-5 w-80 shadow-xl">
     <div class="flex justify-between items-center mb-3">
-      <h3 class="text-sm font-medium font-headline text-gray-800">Keyboard Shortcuts</h3>
+      <h3 id="shortcutsTitle" class="text-sm font-medium font-headline text-gray-800">Keyboard Shortcuts</h3>
       <button id="closeShortcuts" class="material-symbols-outlined sm text-gray-400 hover:text-gray-600 cursor-pointer">close</button>
     </div>
-    <div class="space-y-2 text-xs text-gray-600">
+    <div id="shortcutsList" class="space-y-2 text-xs text-gray-600">
       <div class="flex justify-between"><span>Toggle sidebar</span><span class="kbd">Ctrl+B</span></div>
       <div class="flex justify-between"><span>Save changes</span><span class="kbd">Ctrl+S</span></div>
       <div class="flex justify-between"><span>Undo</span><span class="kbd">Ctrl+Z</span></div>
@@ -288,24 +293,24 @@ const mockData = {
     ]}
   ],
   categories: [
-    { id: "cat1", name: "Sandwiches", color: "#e67e22", active: true, children: [], articles: [
+    { id: "cat1", name: "Sandwiches", nameSv: "Smörgåsar", color: "#e67e22", active: true, children: [], articles: [
       { id: "a1", name: "Club Sandwich", price: 125, productGroup: "Mat", articleNr: "1001", created: "2024-06-12" },
       { id: "a2", name: "BLT", price: 95, productGroup: "Mat", articleNr: "", created: "2024-06-12" },
       { id: "a3", name: "Veggie Wrap", price: 110, productGroup: "Mat", articleNr: "", created: "2024-08-03" },
       { id: "a4", name: "Tuna Melt", price: 105, productGroup: "Mat", articleNr: "1004", created: "2024-09-15" },
       { id: "a5", name: "Grilled Cheese", price: 85, productGroup: "Mat", articleNr: "", created: "2025-01-28" }
     ]},
-    { id: "cat2", name: "Pizza", color: "#27ae60", active: true, children: [
-      { id: "sub2a", name: "Classic Pizza", color: "#2ecc71", active: true, articles: [
+    { id: "cat2", name: "Pizza", nameSv: "Pizza", color: "#27ae60", active: true, children: [
+      { id: "sub2a", name: "Classic Pizza", nameSv: "Klassisk pizza", color: "#2ecc71", active: true, articles: [
         { id: "a6", name: "Margherita", price: 120, productGroup: "Mat", articleNr: "", created: "2023-11-05" },
         { id: "a7", name: "Quattro Formaggi", price: 145, productGroup: "Mat", articleNr: "", created: "2023-11-05" }
       ]},
-      { id: "sub2b", name: "Special Pizza", color: "#1abc9c", active: true, articles: [
+      { id: "sub2b", name: "Special Pizza", nameSv: "Specialpizza", color: "#1abc9c", active: true, articles: [
         { id: "a8", name: "Diavola", price: 140, productGroup: "Mat", articleNr: "", created: "2024-02-20" },
         { id: "a9", name: "Pizza Bianca", price: 170, productGroup: "Mat", articleNr: "1009", created: "2024-02-20" }
       ]}
     ], articles: []},
-    { id: "cat3", name: "Appetizers", color: "#d4780a", active: true, children: [], articles: [
+    { id: "cat3", name: "Appetizers", nameSv: "Förrätter", color: "#d4780a", active: true, children: [], articles: [
       { id: "a10", name: "Antipasto del Magazzino", price: 241.50, productGroup: "Mat", articleNr: "", created: "2023-05-10" },
       { id: "a11", name: "Vitello Tonnato", price: 185, productGroup: "Mat", articleNr: "", created: "2023-05-10" },
       { id: "a12", name: "Bruschette Paesane", price: 165, productGroup: "Mat", articleNr: "", created: "2023-07-22" },
@@ -315,30 +320,30 @@ const mockData = {
       { id: "a16", name: "Kvällens Antipasti", price: 750, productGroup: "Mat", articleNr: "", created: "2025-02-18" },
       { id: "a17", name: "Charkbricka", price: 80, productGroup: "Mat", articleNr: "", created: "2025-06-01" }
     ]},
-    { id: "cat4", name: "Pasta", color: "#f1c40f", active: true, children: [], articles: [
+    { id: "cat4", name: "Pasta", nameSv: "Pasta", color: "#f1c40f", active: true, children: [], articles: [
       { id: "a18", name: "Carbonara", price: 155, productGroup: "Mat", articleNr: "", created: "2023-04-08" },
       { id: "a19", name: "Bolognese", price: 145, productGroup: "Mat", articleNr: "", created: "2023-04-08" },
       { id: "a20", name: "Pesto Genovese", price: 135, productGroup: "Mat", articleNr: "", created: "2023-09-12" },
       { id: "a21", name: "Cacio e Pepe", price: 140, productGroup: "Mat", articleNr: "", created: "2024-11-25" }
     ]},
-    { id: "cat5", name: "Burgers", color: "#3498db", active: true, children: [], articles: [
+    { id: "cat5", name: "Burgers", nameSv: "Burgare", color: "#3498db", active: true, children: [], articles: [
       { id: "a22", name: "Classic Burger", price: 165, productGroup: "Mat", articleNr: "1022", created: "2024-05-17" },
       { id: "a23", name: "Halloumi Burger", price: 155, productGroup: "Mat", articleNr: "", created: "2024-05-17" },
       { id: "a24", name: "Double Smash", price: 195, productGroup: "Mat", articleNr: "", created: "2025-03-10" }
     ]},
-    { id: "cat6", name: "Drinks", color: "#9b59b6", active: true, children: [
-      { id: "sub6a", name: "Hot Drinks", color: "#8e44ad", active: true, articles: [
+    { id: "cat6", name: "Drinks", nameSv: "Drycker", color: "#9b59b6", active: true, children: [
+      { id: "sub6a", name: "Hot Drinks", nameSv: "Varma drycker", color: "#8e44ad", active: true, articles: [
         { id: "a25", name: "Espresso", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-03-01" },
         { id: "a26", name: "Cappuccino", price: 49, productGroup: "Dryck", articleNr: "", created: "2023-03-01" },
         { id: "a27", name: "Latte", price: 55, productGroup: "Dryck", articleNr: "", created: "2023-03-01" },
         { id: "a28", name: "Tea", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-06-15" }
       ]},
-      { id: "sub6b", name: "Cold Drinks", color: "#2980b9", active: true, articles: [
+      { id: "sub6b", name: "Cold Drinks", nameSv: "Kalla drycker", color: "#2980b9", active: true, articles: [
         { id: "a29", name: "Coca-Cola", price: 35, productGroup: "Dryck", articleNr: "", created: "2023-03-01" },
         { id: "a30", name: "Sparkling Water", price: 29, productGroup: "Dryck", articleNr: "", created: "2023-03-01" },
         { id: "a31", name: "Juice", price: 45, productGroup: "Dryck", articleNr: "", created: "2024-04-22" }
       ]},
-      { id: "sub6c", name: "Beer & Wine", color: "#c0392b", active: false, articles: [
+      { id: "sub6c", name: "Beer & Wine", nameSv: "Öl & Vin", color: "#c0392b", active: false, articles: [
         { id: "a32", name: "IPA", price: 79, productGroup: "Dryck", articleNr: "", created: "2024-10-05" },
         { id: "a33", name: "Lager", price: 69, productGroup: "Dryck", articleNr: "", created: "2024-10-05" },
         { id: "a34", name: "House Red", price: 89, productGroup: "Dryck", articleNr: "", created: "2024-10-05" },
@@ -346,7 +351,7 @@ const mockData = {
         { id: "a36", name: "Prosecco", price: 95, productGroup: "Dryck", articleNr: "", created: "2025-12-20" }
       ]}
     ], articles: []},
-    { id: "cat7", name: "Desserts", color: "#795548", active: true, children: [], articles: [
+    { id: "cat7", name: "Desserts", nameSv: "Efterrätter", color: "#795548", active: true, children: [], articles: [
       { id: "a37", name: "Tiramisu", price: 95, productGroup: "Mat", articleNr: "", created: "2023-08-14" },
       { id: "a38", name: "Panna Cotta", price: 85, productGroup: "Mat", articleNr: "", created: "2023-08-14" },
       { id: "a39", name: "Gelato", price: 65, productGroup: "Mat", articleNr: "", created: "2025-04-02" }
@@ -365,6 +370,7 @@ const mockData = {
 // STATE
 // ═══════════════════════════════════════════════
 const state = {
+  lang: 'en',
   sidebarExpanded: false,
   selectedCategoryId: 'cat3', // Appetizers
   expandedNodes: new Set(['cat2', 'cat6']),
@@ -382,6 +388,154 @@ const state = {
   mobileLayout: { cols: 2, rowH: 4 },
   hoveredArticleId: null,
 };
+
+// ═══════════════════════════════════════════════
+// TRANSLATIONS
+// ═══════════════════════════════════════════════
+const translations = {
+  en: {
+    backoffice: 'BackOffice',
+    crLayout: 'CR Layout',
+    company: 'Company',
+    costCenter: 'Cost Center',
+    register: 'Register',
+    wideTablet: 'WIDE (TABLET)',
+    mobile: 'MOBILE',
+    properties: 'Properties',
+    category: 'CATEGORY',
+    name: 'Name',
+    color: 'Color',
+    active: 'Active',
+    wideScreenLayout: 'WIDE SCREEN LAYOUT',
+    mobileScreenLayout: 'MOBILE SCREEN LAYOUT',
+    appliedToAllCategories: 'Applied to all categories',
+    columns: 'Columns',
+    rowHeight: 'Row height',
+    articlesSection: 'ARTICLES',
+    inheritance: 'INHERITANCE',
+    inherited: 'Inherited',
+    customized: 'Customized',
+    custom: 'Custom',
+    inheritFromParent: 'Inherit from parent scope',
+    inheritingFrom: 'Inheriting from:',
+    articlesAssigned: 'articles assigned',
+    selectArticles: 'Select articles',
+    searchArticles: 'Search articles...',
+    selectAll: 'Select all',
+    deselectAll: 'Deselect all',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+    productGroup: 'Product group',
+    articleNr: 'Art.Nr',
+    price: 'Price',
+    created: 'Created',
+    selected: 'selected',
+    addCategory: '+ Category',
+    addSubcategory: '+ Subcategory',
+    filterCategories: 'Filter categories...',
+    allChangesSaved: 'All changes saved',
+    saving: 'Saving...',
+    unassigned: 'Unassigned',
+    keyboardShortcuts: 'Keyboard Shortcuts',
+    toggleSidebar: 'Toggle sidebar',
+    saveChanges: 'Save changes',
+    undo: 'Undo',
+    focusFilter: 'Focus filter',
+    showShortcuts: 'Show shortcuts',
+    dashboard: 'Dashboard',
+    articles: 'Articles',
+    layout: 'Layout',
+    categories: 'Categories',
+    settings: 'Settings',
+    users: 'Users',
+    giftCards: 'Gift cards'
+  },
+  sv: {
+    backoffice: 'BackOffice',
+    crLayout: 'Kassalayout',
+    company: 'Företag',
+    costCenter: 'Kostnadsställe',
+    register: 'Kassa',
+    wideTablet: 'BRED (PLATTA)',
+    mobile: 'MOBIL',
+    properties: 'Egenskaper',
+    category: 'KATEGORI',
+    name: 'Namn',
+    color: 'Färg',
+    active: 'Aktiv',
+    wideScreenLayout: 'BRED SKÄRM',
+    mobileScreenLayout: 'MOBIL SKÄRM',
+    appliedToAllCategories: 'Gäller alla kategorier',
+    columns: 'Kolumner',
+    rowHeight: 'Radhöjd',
+    articlesSection: 'ARTIKLAR',
+    inheritance: 'ARV',
+    inherited: 'Ärvd',
+    customized: 'Anpassad',
+    custom: 'Anpassad',
+    inheritFromParent: 'Ärv från överordnad nivå',
+    inheritingFrom: 'Ärver från:',
+    articlesAssigned: 'artiklar tilldelade',
+    selectArticles: 'Välj artiklar',
+    searchArticles: 'Sök artiklar...',
+    selectAll: 'Välj alla',
+    deselectAll: 'Avmarkera alla',
+    cancel: 'Avbryt',
+    confirm: 'Bekräfta',
+    productGroup: 'Produktgrupp',
+    articleNr: 'Art.nr',
+    price: 'Pris',
+    created: 'Skapad',
+    selected: 'valda',
+    addCategory: '+ Kategori',
+    addSubcategory: '+ Underkategori',
+    filterCategories: 'Filtrera kategorier...',
+    allChangesSaved: 'Alla ändringar sparade',
+    saving: 'Sparar...',
+    unassigned: 'Ej tilldelad',
+    keyboardShortcuts: 'Tangentbordsgenvägar',
+    toggleSidebar: 'Växla sidopanel',
+    saveChanges: 'Spara ändringar',
+    undo: 'Ångra',
+    focusFilter: 'Fokusera filter',
+    showShortcuts: 'Visa genvägar',
+    dashboard: 'Dashboard',
+    articles: 'Artiklar',
+    layout: 'Layout',
+    categories: 'Kategorier',
+    settings: 'Inställningar',
+    users: 'Användare',
+    giftCards: 'Presentkort'
+  }
+};
+
+function t(key) {
+  return (translations[state.lang] && translations[state.lang][key]) || translations.en[key] || key;
+}
+
+function catName(cat) {
+  return state.lang === 'sv' ? (cat.nameSv || cat.name) : cat.name;
+}
+
+function localProductGroup(pg) {
+  if (state.lang === 'sv' && pg === 'Gift cards') return 'Presentkort';
+  return pg;
+}
+
+function setLang(lang) {
+  state.lang = lang;
+  renderAll();
+}
+
+function renderAll() {
+  renderTitleBar();
+  renderTree();
+  renderPreviews();
+  renderInspector();
+  updateStatusPath();
+  renderCategoryTreeButtons();
+  renderSelectArticlesSheetStatic();
+}
 
 // ═══════════════════════════════════════════════
 // HELPERS
@@ -451,7 +605,7 @@ function renderTree() {
 
   function shouldShow(cat) {
     if (!filter) return true;
-    if (matchesFilter(cat.name, filter)) return true;
+    if (matchesFilter(catName(cat), filter)) return true;
     if (cat.children) return cat.children.some(c => shouldShow(c));
     return false;
   }
@@ -484,7 +638,7 @@ function renderTree() {
     s += `<span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:${cat.color}"></span>`;
     // Name
     const nameSize = depth === 0 ? 'text-xs font-medium' : 'text-[11px]';
-    s += `<span class="${nameSize} truncate flex-1 ${inactive ? 'line-through' : ''}">${cat.name}</span>`;
+    s += `<span class="${nameSize} truncate flex-1 ${inactive ? 'line-through' : ''}">${catName(cat)}</span>`;
     // Count
     s += `<span class="bg-gray-100 text-[10px] px-1.5 rounded text-gray-500 shrink-0">${artCount}</span>`;
     s += `</div>`;
@@ -684,7 +838,7 @@ function renderWideCatSidebar() {
     if (inactive) cls += ' opacity-30';
     html += `<button class="${cls}" style="${isSelected ? 'border-color:'+cat.color+';color:'+cat.color : ''}" data-wide-cat="${cat.id}">
       <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:${cat.color}"></span>
-      <span class="truncate">${cat.name}</span>
+      <span class="truncate">${catName(cat)}</span>
     </button>`;
   });
   sidebar.innerHTML = html;
@@ -722,7 +876,7 @@ function renderWideSubcatBar() {
     if (isSelected) cls += 'text-white font-medium shadow-sm';
     else cls += 'bg-white text-gray-600 border-gray-200 hover:bg-gray-100';
     if (inactive) cls += ' opacity-30';
-    html += `<button class="${cls}" style="${isSelected ? 'background:'+sub.color+';border-color:'+sub.color : ''}" data-wide-sub="${sub.id}">${sub.name}</button>`;
+    html += `<button class="${cls}" style="${isSelected ? 'background:'+sub.color+';border-color:'+sub.color : ''}" data-wide-sub="${sub.id}">${catName(sub)}</button>`;
   });
   bar.innerHTML = html;
 
@@ -748,7 +902,7 @@ function renderMobileTabBar() {
     if (isSelected) cls += 'border-current text-gray-800 font-medium';
     else cls += 'border-transparent text-gray-400 hover:text-gray-600';
     if (!cat.active) cls += ' opacity-30';
-    html += `<button class="${cls}" style="color:${isSelected ? cat.color : ''};border-color:${isSelected ? cat.color : 'transparent'}" data-mobile-cat="${cat.id}">${cat.name}</button>`;
+    html += `<button class="${cls}" style="color:${isSelected ? cat.color : ''};border-color:${isSelected ? cat.color : 'transparent'}" data-mobile-cat="${cat.id}">${catName(cat)}</button>`;
   });
   document.getElementById('mobileTabBar').innerHTML = html;
 
@@ -764,7 +918,7 @@ function renderMobileTabBar() {
       if (isSelected) cls += 'text-white font-medium';
       else cls += 'bg-white text-gray-500 border-gray-200 hover:bg-gray-100';
       if (!sub.active) cls += ' opacity-30';
-      subHtml += `<button class="${cls}" style="${isSelected ? 'background:'+sub.color+';border-color:'+sub.color : ''}" data-mobile-sub="${sub.id}">${sub.name}</button>`;
+      subHtml += `<button class="${cls}" style="${isSelected ? 'background:'+sub.color+';border-color:'+sub.color : ''}" data-mobile-sub="${sub.id}">${catName(sub)}</button>`;
     });
     subBar.innerHTML = subHtml;
   } else {
@@ -900,15 +1054,15 @@ function renderInspector() {
   let html = '';
 
   // Category Section
-  html += sectionHeader('category', 'Category');
+  html += sectionHeader('category', t('category'));
   if (state.inspectorSections.category) {
     html += `<div class="px-3 pb-3 space-y-2${lockedCls}">
       <div>
-        <label class="text-[10px] text-gray-500 block mb-0.5">Name</label>
-        <input id="propName" type="text" value="${cat.name}" class="w-full h-6 text-xs bg-white border border-gray-200 rounded-md px-2 text-gray-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20">
+        <label class="text-[10px] text-gray-500 block mb-0.5">${t('name')}</label>
+        <input id="propName" type="text" value="${catName(cat)}" class="w-full h-6 text-xs bg-white border border-gray-200 rounded-md px-2 text-gray-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20">
       </div>
       <div>
-        <label class="text-[10px] text-gray-500 block mb-0.5">Color</label>
+        <label class="text-[10px] text-gray-500 block mb-0.5">${t('color')}</label>
         <div class="flex items-center gap-2">
           <span class="w-4 h-4 rounded-md shrink-0" style="background:${cat.color}"></span>
           <input id="propColor" type="text" value="${cat.color}" class="w-20 h-5 text-[10px] bg-white border border-gray-200 rounded-md px-1.5 text-gray-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 font-mono">
@@ -920,55 +1074,55 @@ function renderInspector() {
         </div>
       </div>
       <div class="flex items-center justify-between">
-        <label class="text-[10px] text-gray-500">Active</label>
+        <label class="text-[10px] text-gray-500">${t('active')}</label>
         <div id="propActive" class="toggle-switch ${cat.active ? 'active' : ''}"></div>
       </div>
     </div>`;
   }
 
   // Wide Screen Layout
-  html += sectionHeader('wide', 'Wide Screen Layout');
+  html += sectionHeader('wide', t('wideScreenLayout'));
   if (state.inspectorSections.wide) {
     html += `<div class="px-3 pb-3 space-y-2${lockedCls}">
-      <p class="text-[10px] text-gray-400 italic">Applied to all categories</p>
-      ${numField('Columns', 'wideCols', state.wideLayout.cols, 1, 10)}
-      ${numField('Row height', 'wideRowH', state.wideLayout.rowH, 1, 10)}
+      <p class="text-[10px] text-gray-400 italic">${t('appliedToAllCategories')}</p>
+      ${numField(t('columns'), 'wideCols', state.wideLayout.cols, 1, 10)}
+      ${numField(t('rowHeight'), 'wideRowH', state.wideLayout.rowH, 1, 10)}
     </div>`;
   }
 
   // Mobile Screen Layout
-  html += sectionHeader('mobile', 'Mobile Screen Layout');
+  html += sectionHeader('mobile', t('mobileScreenLayout'));
   if (state.inspectorSections.mobile) {
     html += `<div class="px-3 pb-3 space-y-2${lockedCls}">
-      <p class="text-[10px] text-gray-400 italic">Applied to all categories</p>
-      ${numField('Columns', 'mobileCols', state.mobileLayout.cols, 1, 10)}
-      ${numField('Row height', 'mobileRowH', state.mobileLayout.rowH, 1, 10)}
+      <p class="text-[10px] text-gray-400 italic">${t('appliedToAllCategories')}</p>
+      ${numField(t('columns'), 'mobileCols', state.mobileLayout.cols, 1, 10)}
+      ${numField(t('rowHeight'), 'mobileRowH', state.mobileLayout.rowH, 1, 10)}
     </div>`;
   }
 
   // Articles
-  html += sectionHeader('articles', 'Articles');
+  html += sectionHeader('articles', t('articlesSection'));
   if (state.inspectorSections.articles) {
     html += `<div class="px-3 pb-3${lockedCls}">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-[10px] text-gray-500">${articles.length} articles assigned</span>
+        <span class="text-[10px] text-gray-500">${articles.length} ${t('articlesAssigned')}</span>
       </div>
       <button id="openSelectArticlesBtn" class="w-full py-1.5 px-3 bg-primary text-white text-[10px] font-medium rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-1 cursor-pointer">
         <span class="material-symbols-outlined" style="font-size:14px;">edit_note</span>
-        Select articles
+        ${t('selectArticles')}
       </button>
     </div>`;
   }
 
   // Inheritance
-  html += sectionHeader('inheritance', 'Inheritance');
+  html += sectionHeader('inheritance', t('inheritance'));
   if (state.inspectorSections.inheritance) {
     html += `<div class="px-3 pb-3 space-y-2">
       <label class="flex items-center gap-2 cursor-pointer">
         <input id="inheritCheckbox" type="checkbox" ${state.inheritLocked ? 'checked' : ''} class="w-3 h-3 accent-primary">
-        <span class="text-[10px] text-gray-500">Inherit from parent scope</span>
+        <span class="text-[10px] text-gray-500">${t('inheritFromParent')}</span>
       </label>
-      ${state.inheritLocked ? '<div class="text-[10px] text-gray-400 pl-5">Inheriting from: <span class="text-primary cursor-pointer hover:underline">Company</span></div>' : ''}
+      ${state.inheritLocked ? '<div class="text-[10px] text-gray-400 pl-5">' + t('inheritingFrom') + ' <span class="text-primary cursor-pointer hover:underline">' + t('company') + '</span></div>' : ''}
     </div>`;
   }
 
@@ -1001,7 +1155,11 @@ function bindInspectorEvents(cat) {
   const nameInput = document.getElementById('propName');
   if (nameInput) {
     nameInput.addEventListener('input', () => {
-      cat.name = nameInput.value;
+      if (state.lang === 'sv' && cat.nameSv !== undefined) {
+        cat.nameSv = nameInput.value;
+      } else {
+        cat.name = nameInput.value;
+      }
       renderTree();
       renderPreviews();
       triggerSave();
@@ -1150,7 +1308,7 @@ function updateScope(scope, skipDropdown) {
     chip.classList.remove('flex');
     state.selectedCC = null;
     state.selectedCR = null;
-    badge.textContent = 'Inherited';
+    badge.textContent = t('inherited');
     badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-200';
     updateStatusPath();
     hideDropdowns();
@@ -1161,7 +1319,7 @@ function updateScope(scope, skipDropdown) {
       chip.classList.remove('hidden');
       chip.classList.add('flex');
       document.getElementById('scopeChipText').textContent = state.selectedCC.name;
-      badge.textContent = 'Custom';
+      badge.textContent = t('custom');
       badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200';
       updateStatusPath();
     }
@@ -1171,7 +1329,7 @@ function updateScope(scope, skipDropdown) {
       chip.classList.remove('hidden');
       chip.classList.add('flex');
       document.getElementById('scopeChipText').textContent = state.selectedCR.name;
-      badge.textContent = 'Custom';
+      badge.textContent = t('custom');
       badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200';
       updateStatusPath();
     }
@@ -1252,7 +1410,7 @@ function updateStatusPath() {
   let path = mockData.company.name;
   if (state.selectedCC) path += ` <span class="material-symbols-outlined xs">chevron_right</span> ${state.selectedCC.name}`;
   if (state.selectedCR) path += ` <span class="material-symbols-outlined xs">chevron_right</span> ${state.selectedCR.name}`;
-  else if (!state.selectedCC) path += ` <span class="material-symbols-outlined xs">chevron_right</span> Company`;
+  else if (!state.selectedCC) path += ` <span class="material-symbols-outlined xs">chevron_right</span> ${t('company')}`;
   el.innerHTML = path;
 }
 
@@ -1265,7 +1423,7 @@ function getAllArticlesFlat() {
     for (const c of cats) {
       if (c.articles && c.articles.length > 0) {
         c.articles.forEach(a => {
-          all.push({ ...a, catColor: c.color, catName: c.name });
+          all.push({ ...a, catColor: c.color, catName: catName(c) });
         });
       }
       if (c.children) walk(c.children);
@@ -1274,7 +1432,7 @@ function getAllArticlesFlat() {
   walk(mockData.categories);
   // Add unassigned
   (mockData.unassignedArticles || []).forEach(a => {
-    all.push({ ...a, catColor: '#9ca3af', catName: 'Unassigned' });
+    all.push({ ...a, catColor: '#9ca3af', catName: t('unassigned') });
   });
   return all;
 }
@@ -1288,7 +1446,8 @@ function openSelectArticles() {
   state.selectArticlesSort = { field: 'name', dir: 'asc' };
   state.selectArticlesOpen = true;
 
-  document.getElementById('saCategoryName').textContent = cat.name;
+  renderSelectArticlesSheetStatic();
+  document.getElementById('saCategoryName').textContent = catName(cat);
   document.getElementById('saSearchInput').value = '';
   document.getElementById('saSearchClear').classList.add('hidden');
 
@@ -1404,20 +1563,20 @@ function renderSelectArticlesPanel() {
   // Update toggle all text
   const allSelected = filtered.length > 0 && filtered.every(a => sel.has(a.id));
   const toggleBtn = document.getElementById('saToggleAll');
-  if (toggleBtn) toggleBtn.textContent = allSelected ? 'Deselect all' : 'Select all';
+  if (toggleBtn) toggleBtn.textContent = allSelected ? t('deselectAll') : t('selectAll');
 
   // Update count
   const countEl = document.getElementById('saSelectionCount');
-  if (countEl) countEl.textContent = sel.size + ' selected';
+  if (countEl) countEl.textContent = sel.size + ' ' + t('selected');
 
   // Column definitions
   const cols = [
-    { key: 'name', label: 'Name' },
-    { key: 'catName', label: 'Category' },
-    { key: 'productGroup', label: 'Product group' },
-    { key: 'articleNr', label: 'Art.Nr' },
-    { key: 'price', label: 'Price' },
-    { key: 'created', label: 'Created' }
+    { key: 'name', label: t('name') },
+    { key: 'catName', label: t('category') },
+    { key: 'productGroup', label: t('productGroup') },
+    { key: 'articleNr', label: t('articleNr') },
+    { key: 'price', label: t('price') },
+    { key: 'created', label: t('created') }
   ];
 
   function sortArrow(key) {
@@ -1441,7 +1600,7 @@ function renderSelectArticlesPanel() {
     html += `<td style="width:36px;padding-left:16px;padding-right:0;"><input type="checkbox" ${isSelected ? 'checked' : ''} class="w-3.5 h-3.5 accent-primary pointer-events-none" tabindex="-1"></td>`;
     html += `<td class="font-medium">${a.name}</td>`;
     html += `<td><span class="sa-cat-dot" style="background:${a.catColor}"></span>${a.catName}</td>`;
-    html += `<td>${a.productGroup || ''}</td>`;
+    html += `<td>${localProductGroup(a.productGroup) || ''}</td>`;
     html += `<td class="text-gray-400">${a.articleNr || '\u2014'}</td>`;
     html += `<td>${formatPriceComma(a.price)}</td>`;
     html += `<td class="text-gray-400">${a.created || ''}</td>`;
@@ -1488,11 +1647,11 @@ document.getElementById('saSearchClear').addEventListener('click', () => {
 let saveTimeout;
 function triggerSave() {
   const el = document.getElementById('statusSaved');
-  el.textContent = 'Saving...';
+  el.textContent = t('saving');
   el.className = 'text-amber-500';
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(() => {
-    el.textContent = 'All changes saved';
+    el.textContent = t('allChangesSaved');
     el.className = 'text-green-600';
   }, 800);
 }
@@ -1550,8 +1709,77 @@ document.getElementById('shortcutsModal').addEventListener('click', (e) => {
 });
 
 // ═══════════════════════════════════════════════
+// RENDER: TRANSLATABLE STATIC ELEMENTS
+// ═══════════════════════════════════════════════
+function renderTitleBar() {
+  document.getElementById('breadcrumbBackoffice').textContent = t('backoffice');
+  document.getElementById('breadcrumbCrLayout').textContent = t('crLayout');
+  document.getElementById('scopeBtnCompany').textContent = t('company');
+  document.getElementById('scopeBtnCC').textContent = t('costCenter');
+  document.getElementById('scopeBtnCR').textContent = t('register');
+  document.getElementById('previewLabelWide').textContent = t('wideTablet');
+  document.getElementById('previewLabelMobile').textContent = t('mobile');
+  document.getElementById('inspectorTitle').textContent = t('properties');
+  document.getElementById('treeFilter').placeholder = t('filterCategories');
+  // Lang toggle highlight
+  const enBtn = document.getElementById('langBtnEn');
+  const svBtn = document.getElementById('langBtnSv');
+  if (state.lang === 'en') {
+    enBtn.className = 'px-1.5 py-0.5 text-[10px] font-medium rounded bg-white text-gray-800 shadow-sm';
+    svBtn.className = 'px-1.5 py-0.5 text-[10px] font-medium rounded text-gray-500';
+  } else {
+    svBtn.className = 'px-1.5 py-0.5 text-[10px] font-medium rounded bg-white text-gray-800 shadow-sm';
+    enBtn.className = 'px-1.5 py-0.5 text-[10px] font-medium rounded text-gray-500';
+  }
+  // Update inheritance badge text
+  const badge = document.getElementById('inheritanceBadge');
+  if (state.scope === 'company') {
+    badge.textContent = t('inherited');
+  } else {
+    badge.textContent = t('custom');
+  }
+  // Status bar
+  const savedEl = document.getElementById('statusSaved');
+  if (savedEl.classList.contains('text-green-600')) {
+    savedEl.textContent = t('allChangesSaved');
+  }
+  // Keyboard shortcuts modal
+  document.getElementById('shortcutsTitle').textContent = t('keyboardShortcuts');
+  document.getElementById('shortcutsList').innerHTML = `
+    <div class="flex justify-between"><span>${t('toggleSidebar')}</span><span class="kbd">Ctrl+B</span></div>
+    <div class="flex justify-between"><span>${t('saveChanges')}</span><span class="kbd">Ctrl+S</span></div>
+    <div class="flex justify-between"><span>${t('undo')}</span><span class="kbd">Ctrl+Z</span></div>
+    <div class="flex justify-between"><span>${t('focusFilter')}</span><span class="kbd">Ctrl+F</span></div>
+    <div class="flex justify-between"><span>${t('showShortcuts')}</span><span class="kbd">?</span></div>
+  `;
+  // Sidebar nav labels
+  const navLabels = { dashboard: 'dashboard', articles: 'articles', layout: 'layout', categories: 'categories', settings: 'settings', users: 'users' };
+  document.querySelectorAll('.sidebar-item').forEach(el => {
+    const key = el.dataset.nav;
+    if (key && navLabels[key]) {
+      el.querySelector('.sidebar-label').textContent = t(navLabels[key]);
+    }
+  });
+}
+
+function renderCategoryTreeButtons() {
+  document.getElementById('btnAddCategory').textContent = t('addCategory');
+  document.getElementById('btnAddSubcategory').textContent = t('addSubcategory');
+}
+
+function renderSelectArticlesSheetStatic() {
+  document.getElementById('saTitle').textContent = t('selectArticles');
+  document.getElementById('saSearchInput').placeholder = t('searchArticles');
+  document.getElementById('saCancelText').textContent = t('cancel');
+  document.getElementById('saConfirmText').textContent = t('confirm');
+}
+
+// ═══════════════════════════════════════════════
 // INITIAL RENDER
 // ═══════════════════════════════════════════════
+renderTitleBar();
+renderCategoryTreeButtons();
+renderSelectArticlesSheetStatic();
 renderTree();
 renderPreviews();
 renderInspector();
